@@ -1,0 +1,31 @@
+{% extends 'main.html' %}
+
+{% block content %}
+
+
+{{ object.name }} <br>
+{{ object.created_on }} <br>
+{{ object.author }} <br>
+{{ object.description }}
+<br>
+<br>
+<br>
+{% for item in object.testpostcondition_set.all %}
+{{ item.action }} <br>   
+{{ item.expected_result }} <br> 
+<br>
+{% endfor %}
+
+{% for item in object.testprecondition_set.all %}
+{{ item.action }} <br>   
+{{ item.expected_result }} <br> 
+<br>
+{% endfor %}
+
+{% for item in object.teststep_set.all %}
+{{ item.action }} <br>   
+{{ item.expected_result }} <br> 
+<br>
+{% endfor %}
+
+{% endblock %}
