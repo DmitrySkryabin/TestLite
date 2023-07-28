@@ -20,3 +20,4 @@ from . import views
 urlpatterns = [
     path('get_test/<int:pk>', views.TestDetailView.as_view()),
 ]
+

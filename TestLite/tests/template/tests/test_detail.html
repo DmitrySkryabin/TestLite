@@ -2,27 +2,26 @@
 
 {% block content %}
 
-
-{{ object.name }} <br>
-{{ object.created_on }} <br>
-{{ object.author }} <br>
-{{ object.description }}
+{{ test.test.name }} <br>
+{{ test.test.created_on }} <br>
+{{ test.test.author }} <br>
+{{ test.test.description }}
 <br>
 <br>
 <br>
-{% for item in object.testpostcondition_set.all %}
+{% for item in test.test_postconditions %}
 {{ item.action }} <br>   
 {{ item.expected_result }} <br> 
 <br>
 {% endfor %}
 
-{% for item in object.testprecondition_set.all %}
+{% for item in test.test_preconditions %}
 {{ item.action }} <br>   
 {{ item.expected_result }} <br> 
 <br>
 {% endfor %}
 
-{% for item in object.teststep_set.all %}
+{% for item in test.test_steps %}
 {{ item.action }} <br>   
 {{ item.expected_result }} <br> 
 <br>
