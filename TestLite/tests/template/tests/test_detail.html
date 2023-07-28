@@ -2,26 +2,26 @@
 
 {% block content %}
 
-{{ test.test.name }} <br>
-{{ test.test.created_on }} <br>
-{{ test.test.author }} <br>
-{{ test.test.description }}
+{{ data.test.name }} <br>
+{{ data.test.created_on }} <br>
+{{ data.test.author }} <br>
+{{ data.test.description }}
 <br>
 <br>
 <br>
-{% for item in test.test_postconditions %}
+{% for item in data.test_postconditions %}
 {{ item.action }} <br>   
 {{ item.expected_result }} <br> 
 <br>
 {% endfor %}
 
-{% for item in test.test_preconditions %}
+{% for item in data.test_preconditions %}
 {{ item.action }} <br>   
 {{ item.expected_result }} <br> 
 <br>
 {% endfor %}
 
-{% for item in test.test_steps %}
+{% for item in data.test_steps %}
 {{ item.action }} <br>   
 {{ item.expected_result }} <br> 
 <br>

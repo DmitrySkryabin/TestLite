@@ -7,7 +7,7 @@ from .services import TestServices
 
 class TestDetailView(DetailView):
 
-    context_object_name = 'test'
+    context_object_name = 'data'
     template_name = 'tests/test_detail.html'
 
     def get_object(self, queryset=None):
@@ -17,7 +17,7 @@ class TestDetailView(DetailView):
 
         return data
 
-
+    
     
         
     
