@@ -26,3 +26,8 @@ class TestServices():
             test_preconditions = test_preconditions,
             test_steps = test_steps
         )
+    
+    @query_debugger
+    def get_all_tests():
+        '''Возвращает список (QuerySet) всех тестов'''
+        return Test.objects.all()

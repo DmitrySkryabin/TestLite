@@ -1,0 +1,11 @@
+{% extends 'main.html' %}
+
+{% block content %}
+
+{% for test in test_list %}
+<a href="{%url 'tests:test_detail' test.id %}">{{ test.name }}</a> <br>
+{{ test.description }} <br>
+{{ test.author }} <br><br>
+{% endfor %}
+
+{% endblock %}

@@ -17,7 +17,11 @@ Including another URLconf
 from django.urls import path
 from . import views
 
+app_name = 'tests'
+
 urlpatterns = [
-    path('get_test/<int:pk>', views.TestDetailView.as_view()),
+    path('test/<int:pk>', views.TestDetailView.as_view(), name='test_detail'),
+    path('test/<int:pk>/edit', views.TestDetailView.as_view(), name='test_detail'),
+    path('tests', views.TestListView.as_view(), name='test_list')
 ]
 
