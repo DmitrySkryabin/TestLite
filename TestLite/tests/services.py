@@ -1,5 +1,6 @@
 from TestLite.utils import query_debugger
 from .models import Test, TestPostcondition, TestPrecondition, TestStep
+from django.forms.models import BaseModelForm
 
 
 class Return:
@@ -27,7 +28,17 @@ class TestServices():
             test_steps = test_steps
         )
     
+    
     @query_debugger
     def get_all_tests():
         '''Возвращает список (QuerySet) всех тестов'''
         return Test.objects.all()
+    
+
+    def save_test(form: BaseModelForm, request) -> BaseModelForm:
+        '''Сохранение экземпляра теста'''
+        test = form.instance
+        test.author = request.user
+        test.save()
+
+        return test

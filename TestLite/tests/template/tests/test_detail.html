@@ -2,6 +2,8 @@
 
 {% block content %}
 
+<a href="{% url 'tests:test_update' data.test.id %}">Редактировать</a> <br> <br>
+
 {{ data.test.name }} <br>
 {{ data.test.created_on }} <br>
 {{ data.test.author }} <br>

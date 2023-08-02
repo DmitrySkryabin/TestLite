@@ -1,9 +1,13 @@
-from typing import Any
+from typing import Any, Optional
 from django.db import models
 from django.db.models.query import QuerySet
-from django.shortcuts import render
-from django.views.generic import DetailView, ListView, UpdateView
+from django.forms.models import BaseModelForm
+from django.http import HttpResponse
+from django.shortcuts import render, redirect
+from django.urls import reverse
+from django.views.generic import DetailView, ListView, UpdateView, CreateView
 from .services import TestServices
+from .forms import TestForm
 
 
 class TestDetailView(DetailView):
@@ -11,13 +15,12 @@ class TestDetailView(DetailView):
     context_object_name = 'data'
     template_name = 'tests/test_detail.html'
 
-    def get_object(self, queryset=None):
-        test_id = self.kwargs.get('pk')
-        data = TestServices.get_all_test_attributes(test_id)
-        print(type(data))
+    def get_object(self):
+        test_id = self.kwargs.get('id')
+        data = TestServices.get_all_test_attributes(id=test_id)
 
         return data
-    
+
 
 
 class TestListView(ListView):
@@ -27,7 +30,32 @@ class TestListView(ListView):
 
 
 class TestUpdateView(UpdateView):
-    pass
+    template_name = 'tests/test_form.html'
+    form_class = TestForm
+
+    def get_object(self):
+        test_id = self.kwargs.get('id')
+        data = TestServices.get_all_test_attributes(id=test_id)
+
+        return data
+
+
+    def form_valid(self, form):
+        TestServices.save_test(form=form, request=self.request)
+        return super().form_valid(form)
+
+
+
+class TestCreateView(CreateView):
+
+    template_name = 'tests/test_form.html'
+    form_class = TestForm
+
+    def form_valid(self, form):
+        TestServices.save_test(form=form, request=self.request)
+        return super().form_valid(form)
+
+
 
     
     
