@@ -18,7 +18,8 @@ class Test(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE, blank=True)
     priority = models.CharField(choices=PriorityChoice.choices, max_length=10)
 
-    created_on = models.DateField(default=timezone.now)
+    #created_on = models.DateField(default=timezone.now)
+    created_on = models.DateField(auto_now=True)
     modified_on = models.DateField(null=True, blank=True)
 
     def __str__(self):
