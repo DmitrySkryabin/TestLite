@@ -2,6 +2,7 @@ from TestLite.utils import query_debugger
 from .models import Test, TestPostcondition, TestPrecondition, TestStep
 from django.forms import modelformset_factory
 from django.forms.models import BaseModelForm
+from django.db.models.query import QuerySet
 from .forms import TestStepForm, TestPostconditionForm, TestPreconditionForm
 
 
@@ -37,26 +38,27 @@ class TestServices():
         return Test.objects.all()
 
 
-    def get_tests_all_forms(data: Return = None) -> Return:
-        '''Возвращает все формы для редакирования теста и его шагов
+    def get_tests_all_forms(data: Return = None) -> dict:
+        '''
+        Возвращает все формы для редакирования теста и его шагов
         preconditions, steps, postconditions
-        Получает: Return где хранятся queryset для этих моделей'''
-        TestPreconditionFormset = modelformset_factory(model=TestPrecondition, form=TestPreconditionForm) # Предусловия
-        TestStepFormset = modelformset_factory(model=TestStep, form=TestStepForm) # Шаги
-        TestPostconditionFormset = modelformset_factory(model=TestPostcondition, form=TestPostconditionForm) # Постусловия
+        Получает: Return где хранятся queryset для этих моделей
+        '''
+        TestPreconditionFormset = modelformset_factory(model=TestPrecondition, form=TestPreconditionForm)       # Предусловия
+        TestStepFormset = modelformset_factory(model=TestStep, form=TestStepForm)                               # Шаги
+        TestPostconditionFormset = modelformset_factory(model=TestPostcondition, form=TestPostconditionForm)    # Постусловия
 
-        # Тут определенно нужно написать как то красиво хочу типа 
-        # меньше повторять код
-        if data is not None:
-            data.test_preconditions = []
-            data.test_steps = []
-            data.test_postconditions = []
+        if data is None:
+            print('heh')
+            data.test_preconditions = QuerySet()
+            data.test_steps = QuerySet()
+            data.test_postconditions = QuerySet()
 
         return Return(
-            form_precondition_formset=modelformset_factory(model=TestPrecondition, form=TestPreconditionForm),
-            form_step_formset=modelformset_factory(model=TestStep, form=TestStepForm),
-            form_postcondition_formset=TestPostconditionFormset(data.test_postconditions)
-        )
+            form_precondition_formset=TestPreconditionFormset(queryset=data.test_preconditions),
+            form_step_formset=TestStepFormset(queryset=data.test_steps),
+            form_postcondition_formset=TestPostconditionFormset(queryset=data.test_postconditions)
+        ).__dict__
     
 
     def save_test(form: BaseModelForm, request) -> BaseModelForm:

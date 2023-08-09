@@ -11,11 +11,6 @@
 <br>
 <br>
 <br>
-{% for item in data.test_postconditions %}
-{{ item.action }} <br>   
-{{ item.expected_result }} <br> 
-<br>
-{% endfor %}
 
 {% for item in data.test_preconditions %}
 {{ item.action }} <br>   
@@ -24,6 +19,12 @@
 {% endfor %}
 
 {% for item in data.test_steps %}
+{{ item.action }} <br>   
+{{ item.expected_result }} <br> 
+<br>
+{% endfor %}
+
+{% for item in data.test_postconditions %}
 {{ item.action }} <br>   
 {{ item.expected_result }} <br> 
 <br>

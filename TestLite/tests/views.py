@@ -1,11 +1,6 @@
-from typing import Any, Optional
-from django.db import models
-from django.db.models.query import QuerySet
-from django.forms.models import BaseModelForm
-from django.http import HttpResponse
-from django.shortcuts import render, redirect
+from django.shortcuts import redirect
 from django.urls import reverse
-from django.forms import formset_factory, modelformset_factory
+from django.forms import formset_factory
 from django.views.generic import DetailView, ListView, UpdateView, CreateView
 from .services import TestServices
 from .forms import TestForm, TestPostconditionForm, TestPreconditionForm, TestStepForm
@@ -43,19 +38,13 @@ class TestUpdateView(UpdateView):
 
 
     def get_context_data(self):
-        
-        # TestPreconditionFormset = modelformset_factory(form=TestPreconditionForm)
-        # TestStepFormset = modelformset_factory(form=TestStepForm)
-        # TestPostconditionFormset = modelformset_factory(form=TestPostconditionForm)
         context = super().get_context_data()
         context.update(
-            TestServices.get_tests_all_forms(self.data).__dict__
+            TestServices.get_tests_all_forms(self.data)
         )
-        print(context)
 
         return context
         
-
 
     def form_valid(self, form):
         TestServices.save_test(form=form, request=self.request)
