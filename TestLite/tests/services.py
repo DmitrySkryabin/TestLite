@@ -47,19 +47,21 @@ class TestServices():
         TestPreconditionFormset = modelformset_factory(model=TestPrecondition, form=TestPreconditionForm)       # Предусловия
         TestStepFormset = modelformset_factory(model=TestStep, form=TestStepForm)                               # Шаги
         TestPostconditionFormset = modelformset_factory(model=TestPostcondition, form=TestPostconditionForm)    # Постусловия
-
         if data is None:
-            print('heh')
-            data.test_preconditions = QuerySet()
-            data.test_steps = QuerySet()
-            data.test_postconditions = QuerySet()
+            return_data =  Return(
+                form_precondition_formset=TestPreconditionFormset(queryset=TestPrecondition.objects.none()),
+                form_step_formset=TestStepFormset(queryset=TestStep.objects.none()),
+                form_postcondition_formset=TestPostconditionFormset(queryset=TestPostcondition.objects.none())
+            )
+        else:
+            return_data =  Return(
+                form_precondition_formset=TestPreconditionFormset(queryset=data.test_preconditions),
+                form_step_formset=TestStepFormset(queryset=data.test_steps),
+                form_postcondition_formset=TestPostconditionFormset(queryset=data.test_postconditions)
+            )
 
-        return Return(
-            form_precondition_formset=TestPreconditionFormset(queryset=data.test_preconditions),
-            form_step_formset=TestStepFormset(queryset=data.test_steps),
-            form_postcondition_formset=TestPostconditionFormset(queryset=data.test_postconditions)
-        ).__dict__
-    
+        return return_data.__dict__
+        
 
     def save_test(form: BaseModelForm, request) -> BaseModelForm:
         '''Сохранение экземпляра теста'''

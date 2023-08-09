@@ -1,11 +1,11 @@
 <form action="" method="post">
     <h2>Test main info</h2>
     {% csrf_token %}
-    {{ form.as_p }}
+    {{ form.as_p }} <br>
     <h3>Test attributes</h3>
     <h4>Preconditions: </h4>
     {% for precondition in form_precondition_formset %}
-    {{ precondition }}
+    {{ precondition }} <br>
     {% endfor %}
     <h4>Steps: </h4>
     {% for step in form_step_formset %}
@@ -13,7 +13,7 @@
     {% endfor %}
     <h4>Postconditions: </h4>
     {% for postcondition in form_postcondition_formset %}
-    {{ postcondition }}
+    {{ postcondition }} <br>
     {% endfor %}
     <button type="submit">Save</button>
 </form>

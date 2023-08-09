@@ -56,19 +56,18 @@ class TestCreateView(CreateView):
     '''Создание нового инстанса теста'''
     template_name = 'tests/test_form.html'
     form_class = TestForm
-    # form_class_precondition = TestPreconditionForm
-    # form_class_postcondition = TestPostconditionForm
-    # form_class_step = TestStepForm
+    
 
     def get_context_data(self):
-        '''Добавялем новые формы для связанных с тестом атрибутов
-        Шаги, предусловия и постусловия'''
+        '''
+        Добавялем новые формы для связанных с тестом атрибутов
+        Шаги, предусловия и постусловия
+        '''
         context = super().get_context_data()
-        context['form_precondition_formset'] = formset_factory(TestPreconditionForm)
-        context['form_step_formset'] = formset_factory(TestStepForm)
-        context['form_postcondition_formset'] = formset_factory(TestPostconditionForm)
+        context.update(
+            TestServices.get_tests_all_forms()
+        )
 
-        print(context)
         return context
 
     
