@@ -63,10 +63,40 @@ class TestServices():
         return return_data.__dict__
         
 
-    def save_test(form: BaseModelForm, request) -> BaseModelForm:
-        '''Сохранение экземпляра теста'''
-        test = form.instance
-        test.author = request.user
-        test.save()
+    # def save_test(form: BaseModelForm, request) -> BaseModelForm:
+    #     '''Сохранение экземпляра теста'''
+    #     print(request.user)
+    #     test = form.instance
+    #     test.author = request.user
+        
+    #     # test.save()
 
-        return test
+    #     return test
+
+
+    def get_valid_tests_forms(request) -> Return or None:
+        '''Если формы валидны возвращает формы если нет то None'''
+        test_preconditions = TestPreconditionForm(request.POST)
+        test_steps = TestStepForm(request.POST)
+        test_postconditions = TestPostconditionForm(request.POST)
+
+        if test_preconditions.is_valid() and test_steps.is_valid() and test_postconditions.is_valid():
+            return Return(
+                form_precondition_formset=test_preconditions,
+                form_step_formset=test_steps,
+                form_postcondition_formset=test_postconditions
+            )
+        else:
+            return None
+
+
+    def save_test_and_test_atibutes(form, request):
+        '''Сохраянет тест и его атрибуты'''
+        test_preconditions = TestPreconditionForm(request.POST)
+        test_steps = TestStepForm(request.POST)
+        test_postconditions = TestPostconditionForm(request.POST)
+
+        form.author = request.user
+        test_preconditions.save()
+        test_steps.save()
+        test_postconditions.save()
