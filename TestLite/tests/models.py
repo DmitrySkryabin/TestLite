@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.urls import reverse
 from django.core.exceptions import ValidationError
+from django.utils.translation import gettext_lazy as _
 
 # Create your models here.
 
@@ -16,9 +17,9 @@ def invalid_name_validator(value):
 class Test(models.Model):
     '''Основная информация по тестам'''
     class PriorityChoice(models.TextChoices):
-        LOW = 'Низкий'
-        MEDIUM = 'Средний'
-        HIGH = 'Высокий'
+        LOW = 'L', _('Низкий')
+        MEDIUM = 'M', _('Средний')
+        HIGH = 'H', _('Высокий')
 
     name = models.CharField(max_length=200, validators=[invalid_name_validator])
     description = models.TextField(validators=[invalid_name_validator])
@@ -38,7 +39,7 @@ class Test(models.Model):
 
 class TestPrecondition(models.Model):
     '''Предусловия для теста'''
-    action = models.CharField(max_length=500, validators=[invalid_name_validator]) # Может больше или меньше
+    action = models.TextField(validators=[invalid_name_validator]) # Может больше или меньше
     expected_result = models.TextField(validators=[invalid_name_validator])
     position = models.IntegerField()
     test = models.ForeignKey(Test, on_delete=models.CASCADE)
@@ -53,7 +54,7 @@ class TestPrecondition(models.Model):
 
 class TestStep(models.Model):
     '''Шаги которые включены в тест'''
-    action = models.CharField(max_length=500, validators=[invalid_name_validator]) # Может больше или меньше
+    action = models.TextField(validators=[invalid_name_validator]) # Может больше или меньше
     expected_result = models.TextField(validators=[invalid_name_validator])
     position = models.IntegerField()
     test = models.ForeignKey(Test, on_delete=models.CASCADE, blank=True)
@@ -69,7 +70,7 @@ class TestStep(models.Model):
 
 class TestPostcondition(models.Model):
     '''Постусловия для теста'''
-    action = models.CharField(max_length=500, validators=[invalid_name_validator]) # Может больше или меньше
+    action = models.TextField(validators=[invalid_name_validator]) # Может больше или меньше
     expected_result = models.TextField(validators=[invalid_name_validator])
     position = models.IntegerField()
     test = models.ForeignKey(Test, on_delete=models.CASCADE)

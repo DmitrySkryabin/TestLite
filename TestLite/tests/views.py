@@ -44,10 +44,10 @@ class TestUpdateView(TestCreateUpdateMixin, UpdateView):
         чтобы при редактировании были указаны уже имеющиеся данные
         '''
         self._formsets = self.Formsets(
-                form_precondition_formset = self.form_precondition_formset(queryset=TestPrecondition.objects.filter(test__id=self.kwargs.get('id')), prefix='preconditions'),
-                form_step_formset = self.form_step_formset(queryset=TestStep.objects.filter(test__id=self.kwargs.get('id')), prefix='steps'),
-                form_postcondition_formset = self.form_postcondition_formset(queryset=TestPostcondition.objects.filter(test__id=self.kwargs.get('id')), prefix='postconditions')
-            )
+            form_precondition_formset = self.form_precondition_formset(queryset=TestPrecondition.objects.filter(test__id=self.kwargs.get('id')), prefix='preconditions'),
+            form_step_formset = self.form_step_formset(queryset=TestStep.objects.filter(test__id=self.kwargs.get('id')), prefix='steps'),
+            form_postcondition_formset = self.form_postcondition_formset(queryset=TestPostcondition.objects.filter(test__id=self.kwargs.get('id')), prefix='postconditions')
+        )
 
 
     def get_object(self):

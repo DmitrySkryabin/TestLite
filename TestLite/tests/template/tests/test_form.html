@@ -1,3 +1,7 @@
+{% extends 'main.html' %}
+
+{% block content %}
+
 <form action="" method="post">
     <h2>Test main info</h2>
     {% csrf_token %}
@@ -29,3 +33,5 @@
     {% endfor %}
     <button type="submit">Save</button>
 </form>
+
+{% endblock %}
