@@ -12,22 +12,19 @@
     <br>
     <h4>Test Preconditions</h4>
     {% for item in test_preconditions %}
-        <div class="con">
-            <b>Action</b>: {{ item.action }} <b>Expected result</b>: {{item.expected_result}} <select name="hui-{{item.id}}">{{select.result}}</select>
-        </div> 
-        <br>
+        <b>Action</b>: {{ item.action }} <b>Expected result</b>: {{item.expected_result}} <select name="preconditions">{% for option in select.result %}{{ option }}{% endfor %}</select> <br>
     {% endfor %}
     <br>
     <br>
     <h4>Test Steps</h4>
     {% for item in test_steps %}
-        <b>Action</b>: {{ item.action }} <b>Expected result</b>: {{item.expected_result}} {{ select }}<br>
+    <b>Action</b>: {{ item.action }} <b>Expected result</b>: {{item.expected_result}} <select name="steps">{% for option in select.result %}{{ option }}{% endfor %}</select> <br>
     {% endfor %}
     <br>
     <br>
     <h4>Test Postconditions</h4>
     {% for item in test_postconditions %}
-        <b>Action</b>: {{ item.action }} <b>Expected result</b>: {{item.expected_result}} {{ select }}<br>
+    <b>Action</b>: {{ item.action }} <b>Expected result</b>: {{item.expected_result}} <select name="postconditions">{% for option in select.result %}{{ option }}{% endfor %}</select> <br>
     {% endfor %}
 
     <button type="submit">Сохранить</button>

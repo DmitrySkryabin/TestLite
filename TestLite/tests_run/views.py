@@ -9,8 +9,8 @@ from .forms import TestRunForm, SelectResultForm
 # Create your views here.
 
 
-class TestRunCreateView(FormView):
-
+class TestRunFormView(FormView):
+    # Походу нужно побпловаться с формсет фактори
     form_class = TestRunForm
     template_name = 'tests_run/test_run_form.html'
 
@@ -26,8 +26,13 @@ class TestRunCreateView(FormView):
         context['test_postconditions'] = TestPostcondition.objects.filter(test__id=test_id)
 
         return context
+    
 
-
-    def post(self, request, *args, **kwargs):
-        print(request.POST)
+    def form_valid(self, form):
+        print('________________')
+        print(self.request.POST['steps'])
+        print(''.join(self.request.POST['steps']))
+        print(TestStep.objects.filter(test__id=self.kwargs.get('id')).count())
+        if len(''.join(self.request.POST['steps'])) == TestStep.objects.filter(test__id=self.kwargs.get('id')).count():
+            print(self.request.POST['steps'])
         return HttpResponse('rer')

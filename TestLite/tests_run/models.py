@@ -28,7 +28,7 @@ class TestRun(models.Model):
 class TestRunPrecondition(models.Model):
     '''Информация о том как прошел данный шаг (предусловие)'''
     test_run = models.ForeignKey(TestRun, on_delete=models.CASCADE)
-    test_precondition = models.ForeignKey('tests.TestPrecondition', on_delete=models.SET_NULL, null=True)
+    #test_precondition = models.ForeignKey('tests.TestPrecondition', on_delete=models.SET_NULL, null=True)
 
     action = models.TextField()
     expected_result = models.TextField()
@@ -41,7 +41,7 @@ class TestRunPrecondition(models.Model):
 class TestRunStep(models.Model):
     '''Информация о том как прошел данный шаг (Шаг)'''
     test_run = models.ForeignKey(TestRun, on_delete=models.CASCADE)
-    test_step = models.ForeignKey('tests.TestStep', on_delete=models.SET_NULL, null=True)
+    #test_step = models.ForeignKey('tests.TestStep', on_delete=models.SET_NULL, null=True)
 
     action = models.TextField()
     expected_result = models.TextField()
@@ -54,7 +54,7 @@ class TestRunStep(models.Model):
 class TestRunPostcondition(models.Model):
     '''Информация о том как прошел данный шаг (Постусловие)'''
     test_run = models.ForeignKey(TestRun, on_delete=models.CASCADE)
-    test_postcondition = models.ForeignKey('tests.TestPostcondition', on_delete=models.SET_NULL, null=True)
+    #test_postcondition = models.ForeignKey('tests.TestPostcondition', on_delete=models.SET_NULL, null=True)
 
     action = models.TextField()
     expected_result = models.TextField()
