@@ -10,6 +10,10 @@
     {{ form.as_p }}
 
     <br>
+    <h4>Test Precondition Formset</h4>
+    {% for form in test_precondition_formset %}
+        {{ form }}
+    {% endfor %}
     <h4>Test Preconditions</h4>
     {% for item in test_preconditions %}
         <b>Action</b>: {{ item.action }} <b>Expected result</b>: {{item.expected_result}} <select name="preconditions">{% for option in select.result %}{{ option }}{% endfor %}</select> <br>

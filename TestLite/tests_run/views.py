@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django.http import HttpResponse
+from django.forms import formset_factory
 from django.views.generic import DetailView, TemplateView, CreateView, FormView
 
 from tests.models import Test, TestPrecondition, TestPostcondition, TestStep
@@ -18,9 +19,13 @@ class TestRunFormView(FormView):
     def get_context_data(self):
         context = super().get_context_data()
         test_id = self.kwargs.get('id')
+
+        TestPreconditionFormset = formset_factory(SelectResultForm)
         
         context['test_id'] = test_id
         context['select'] = SelectResultForm
+        context['test_precondition_formset'] = TestPreconditionFormset()
+        print(context['test_precondition_formset'])
         context['test_preconditions'] = TestPrecondition.objects.filter(test__id=test_id)
         context['test_steps'] = TestStep.objects.filter(test__id=test_id)
         context['test_postconditions'] = TestPostcondition.objects.filter(test__id=test_id)

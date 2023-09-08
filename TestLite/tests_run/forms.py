@@ -18,9 +18,3 @@ class TestRunForm(forms.ModelForm):
 
 class SelectResultForm(forms.Form):
     result = forms.ChoiceField(choices=[('', '---------')] + ResultChoice.choices)
-
-    # def set_name(self, id):
-    #     self.fields['result'].widget.attrs.update({
-    #         'name': id
-    #     })
-    #     return self
