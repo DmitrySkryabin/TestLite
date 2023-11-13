@@ -9,27 +9,28 @@
     {% csrf_token %}
     {{ form.as_p }}
 
-    <br>
-    <h4>Test Precondition Formset</h4>
-    {% for form in test_precondition_formset %}
-        {{ form }}
-    {% endfor %}
+
     <h4>Test Preconditions</h4>
-    {% for item in test_preconditions %}
-        <b>Action</b>: {{ item.action }} <b>Expected result</b>: {{item.expected_result}} <select name="preconditions">{% for option in select.result %}{{ option }}{% endfor %}</select> <br>
+    {{ test_precondition_formset.management_form }}
+    {% for item in test_precondition_formset %}
+        <b>Action:</b> {{ item.action }} <b>Expected result:</b> {{ item.expected_result }} {{ item }} <br>
     {% endfor %}
     <br>
-    <br>
+
     <h4>Test Steps</h4>
-    {% for item in test_steps %}
-    <b>Action</b>: {{ item.action }} <b>Expected result</b>: {{item.expected_result}} <select name="steps">{% for option in select.result %}{{ option }}{% endfor %}</select> <br>
+    {{ test_step_formset.management_form }}
+    {% for item in test_step_formset %}
+        <b>Action:</b> {{ item.action }} <b>Expected result:</b> {{ item.expected_result }} {{ item }} <br>
     {% endfor %}
     <br>
-    <br>
+
     <h4>Test Postconditions</h4>
-    {% for item in test_postconditions %}
-    <b>Action</b>: {{ item.action }} <b>Expected result</b>: {{item.expected_result}} <select name="postconditions">{% for option in select.result %}{{ option }}{% endfor %}</select> <br>
+    {{ test_postcondition_formset.management_form }}
+    {% for item in test_postcondition_formset %}
+        <b>Action:</b> {{ item.action }} <b>Expected result:</b> {{ item.expected_result }} {{ item }} <br>
     {% endfor %}
+    <br>
+
 
     <button type="submit">Сохранить</button>
 </form>

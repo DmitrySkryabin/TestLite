@@ -16,5 +16,17 @@ class TestRunForm(forms.ModelForm):
         ]
 
 
-class SelectResultForm(forms.Form):
-    result = forms.ChoiceField(choices=[('', '---------')] + ResultChoice.choices)
+
+class SelectResultForm(forms.ModelForm):
+    '''Форма для выполнения сохранения результатов теста
+    Изменяемая часть это результат, останые данные о шагах записаны в переменные'''
+    def __init__(self, *args, **kwargs):
+        if kwargs['instance'] is not None:
+            self.action = kwargs['instance'].action # получем и записываем поле action из запроса который вызывает форму из modelformset_factorys
+            self.expected_result = kwargs['instance'].expected_result # 
+        super().__init__(*args, **kwargs)
+
+    class Meta:
+        fields = [
+            'result'
+        ]
