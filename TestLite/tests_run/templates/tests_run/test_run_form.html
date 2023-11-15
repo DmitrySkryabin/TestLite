@@ -10,13 +10,29 @@
     {{ form.as_p }}
 
 
-    <h4>Test Preconditions</h4>
+    <!-- <h4>Test Preconditions</h4>
     {{ test_precondition_formset.management_form }}
     {% for item in test_precondition_formset %}
         <b>Action:</b> {{ item.action }} <b>Expected result:</b> {{ item.expected_result }} {{ item }} <br>
     {% endfor %}
-    <br>
+    <br> -->
 
+    <h4>Test Preconditions TEST</h4>
+    {{ test_precondition_formset_test.management_form }}
+    <!-- {% for error in test_precondition_formset_test.errors %}
+        {{ error }}
+    {% endfor %}
+    {% for item in test_precondition_formset_test %}
+        {{ item.id }}
+        <b>Action:</b> {{ item.action.value }}{{ item.action }} {% for error in item.action.errors %}{{ error }}{% endfor %}
+         <b>Expected result:</b> {{ item.expected_result.value }}{{ item.expected_result }} {% for error in item.expected_result.errors %}{{ error }}{% endfor %}
+         {{ item.result }} <br>
+        {% endfor %} -->
+        {% for form in test_precondition_formset_test %}
+            {{ form }}
+        {% endfor %}
+    <br>
+<!-- 
     <h4>Test Steps</h4>
     {{ test_step_formset.management_form }}
     {% for item in test_step_formset %}
@@ -29,7 +45,7 @@
     {% for item in test_postcondition_formset %}
         <b>Action:</b> {{ item.action }} <b>Expected result:</b> {{ item.expected_result }} {{ item }} <br>
     {% endfor %}
-    <br>
+    <br> -->
 
 
     <button type="submit">Сохранить</button>

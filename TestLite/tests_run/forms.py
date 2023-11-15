@@ -1,4 +1,5 @@
 from django import forms
+from django.forms.widgets import HiddenInput
 from .models import TestRun, ResultChoice
 
 
@@ -30,3 +31,17 @@ class SelectResultForm(forms.ModelForm):
         fields = [
             'result'
         ]
+
+class SelectResultForm2(forms.ModelForm):
+    '''Форма для выполнения сохранения результатов теста
+    Изменяемая часть это результат, останые данные о шагах записаны в переменные'''
+    class Meta:
+        fields = [
+            'action',
+            'expected_result',
+            'result'
+        ]
+        # widgets = {
+        #     'action': HiddenInput(),
+        #     'expected_result': HiddenInput()
+        # }

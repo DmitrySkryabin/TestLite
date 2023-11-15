@@ -1,5 +1,14 @@
 from django.db import models
+from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
+
+
+
+def invalid_name_validator(value):
+    if 'invalid' in value:
+        raise ValidationError('Это тестовое не валидируемое название')
+    else:
+        return value
 
 
 
@@ -7,6 +16,7 @@ class ResultChoice(models.TextChoices):
     PASSED = 'P', _('Успешно')
     FAIL = 'F', _('Провал')
     ERROR = 'E', _('Ошибка')
+
 
 
 class TypeOfRun(models.TextChoices):
@@ -30,7 +40,7 @@ class TestRunPrecondition(models.Model):
     test_run = models.ForeignKey(TestRun, on_delete=models.CASCADE)
     #test_precondition = models.ForeignKey('tests.TestPrecondition', on_delete=models.SET_NULL, null=True)
 
-    action = models.TextField()
+    action = models.TextField(validators=[invalid_name_validator])
     expected_result = models.TextField()
     position = models.IntegerField()
 
