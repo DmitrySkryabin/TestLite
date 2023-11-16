@@ -62,20 +62,20 @@ class TestRunFormView(FormView):
         context['test_id'] = test_id
   
         if self.request.POST:
-            context['test_precondition_formset'] = self.TestPreconditionFormset(self.request.POST, prefix='preconditions')
+            context['test_precondition_formset'] = self.TestPreconditionFormset(self.request.POST, result_required=True, prefix='preconditions')
         else:
-            print([{'action': item.action, 'expected_result': item.expected_result} for item in TestPrecondition.objects.filter(test__id=test_id)])
             context['test_precondition_formset'] = self.TestPreconditionFormset(initial=[
                 {'action': item.action, 'expected_result': item.expected_result} for item in TestPrecondition.objects.filter(test__id=test_id)
-            ])
+            ], prefix='preconditions', result_required=True)
 
         return context
     
 
-    # def form_valid(self, form):
-
-    #     if self.TestPreconditionFormset(self.request.POST, prefix='preconditions').is_valid():
-    #         return HttpResponse('rer')
-    #     else:
-    #         print(self.TestPreconditionFormset(self.request.POST, prefix='preconditions').errors)
-    #         return self.render_to_response(self.get_context_data(form=form))
+    def form_valid(self, form):
+        test_precondition_formset = self.TestPreconditionFormset(self.request.POST, prefix='preconditions')
+        if test_precondition_formset.is_valid():
+            for instance in test_precondition_formset.cleaned_data:
+                print(instance)
+            return HttpResponse('heh')
+        else:
+            return self.render_to_response(self.get_context_data(form=form))

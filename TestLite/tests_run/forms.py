@@ -1,6 +1,5 @@
 from django import forms
-from django.forms.widgets import HiddenInput
-from .models import TestRun, ResultChoice, TestRunPrecondition
+from .models import TestRun, ResultChoice
 
 
 # class TestRunForm(forms.Form):
@@ -35,10 +34,12 @@ class SelectResultForm(forms.ModelForm):
 class SelectResultForm2(forms.Form):
     '''Форма для выполнения сохранения результатов теста
     Изменяемая часть это результат, останые данные о шагах записаны в переменные'''
-    action = forms.Textarea()
-    expected_result = forms.Textarea()
-    result = forms.ChoiceField(choices=[('', '---------')] + ResultChoice.choices)
-        # widgets = {
-        #     'action': HiddenInput(),
-        #     'expected_result': HiddenInput()
-        # }
+    action = forms.CharField(widget=forms.HiddenInput())
+    expected_result = forms.CharField(widget=forms.HiddenInput())
+    result = forms.ChoiceField(choices=[('', '---------')] + ResultChoice.choices, required=False)
+
+    def __init__(self, *args, **kwargs):
+        result_required = kwargs.get('result_required', None)
+        super().__init__(*args, **kwargs)
+        print(result_required)
+
