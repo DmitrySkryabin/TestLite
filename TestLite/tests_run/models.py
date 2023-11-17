@@ -29,9 +29,10 @@ class TestRun(models.Model):
     test = models.ForeignKey('tests.Test', on_delete=models.CASCADE)
     result = models.CharField(choices=ResultChoice.choices, max_length=10)
     type = models.CharField(choices=TypeOfRun.choices, default=TypeOfRun.MANUAL, max_length=10)
+    tester = user
 
     start_on = models.DateTimeField()
-    stop_on = models.DateTimeField()
+    stop_on = models.DateTimeField(auto_now=True)
 
 
 

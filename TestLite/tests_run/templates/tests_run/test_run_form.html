@@ -18,6 +18,24 @@
             <b>Action:</b>{{ form.action.value }}{{ form.action }} <b>Expected result:</b>{{ form.expected_result.value }}{{ form.expected_result }}   {{ form.result }} <br>
         {% endfor %}
     <br>
+    <h4>Test Steps</h4>
+        {{ test_step_formset.management_form }}
+        {% for error in  test_step_formset.errors%}
+            {{ error }}
+        {% endfor %}
+        {% for form in test_step_formset %}
+            <b>Action:</b>{{ form.action.value }}{{ form.action }} <b>Expected result:</b>{{ form.expected_result.value }}{{ form.expected_result }}   {{ form.result }} <br>
+        {% endfor %}
+    <br>
+    <h4>Test Postconditions</h4>
+        {{ test_postcondition_formset.management_form }}
+        {% for error in  test_postcondition_formset.errors%}
+            {{ error }}
+        {% endfor %}
+        {% for form in test_postcondition_formset %}
+            <b>Action:</b>{{ form.action.value }}{{ form.action }} <b>Expected result:</b>{{ form.expected_result.value }}{{ form.expected_result }}   {{ form.result }} <br>
+        {% endfor %}
+    <br>
 
     <button type="submit">Сохранить</button>
 </form>
