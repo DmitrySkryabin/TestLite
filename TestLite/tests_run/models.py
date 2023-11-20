@@ -1,5 +1,6 @@
 from django.db import models
 from django.core.exceptions import ValidationError
+from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
 
 
@@ -29,7 +30,7 @@ class TestRun(models.Model):
     test = models.ForeignKey('tests.Test', on_delete=models.CASCADE)
     result = models.CharField(choices=ResultChoice.choices, max_length=10)
     type = models.CharField(choices=TypeOfRun.choices, default=TypeOfRun.MANUAL, max_length=10)
-    tester = user
+    tester = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
 
     start_on = models.DateTimeField()
     stop_on = models.DateTimeField(auto_now=True)
