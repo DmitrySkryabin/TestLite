@@ -8,7 +8,7 @@ from django.contrib.auth import get_user_model
 from django.views.generic import DetailView, TemplateView, CreateView, FormView, TemplateView
 
 from tests.models import Test, TestPrecondition, TestPostcondition, TestStep
-from .models import TestRun, ResultChoice, TestRunPrecondition, TestRunStep, TestRunPostcondition
+from .models import ResultChoice, TestRun, ResultChoice, TestRunPrecondition, TestRunStep, TestRunPostcondition
 from .forms import TestRunForm, TestResultsFormset
 
 
@@ -123,6 +123,10 @@ class TestRunFormView(TemplateView):
             record.result = instance['result']
 
         return record
+    
+
+    def assign_result_of_test_run(self, result):
+        result = result
 
 
     def post(self, requset, *args, **kwargs):
@@ -138,7 +142,7 @@ class TestRunFormView(TemplateView):
             test_run.type = 'M'
             #test_run.save()
 
-            calculated_result = 'P'
+            calculated_result = ResultChoice.PASSED
 
             test_run_preconditions = []
             test_run_steps = []
@@ -148,13 +152,18 @@ class TestRunFormView(TemplateView):
                 test_run_precondition = self.fill_instance_of_data(instance, i, TestRunPrecondition)
                 test_run_precondition.test_run = test_run
                 test_run_preconditions.append(test_run_precondition)
+
             for i, instance in enumerate(context['test_step_formset'].cleaned_data):
                 test_run_step = self.fill_instance_of_data(instance, i, TestRunStep)
                 test_run_step.test_run = test_run
                 test_run_steps.append(test_run_step)
-                if test_run_step.result != 'P':
-                    Сама проверка тут говно нужно градацию придумать уровней провала типа ошибка или нет и вообще добавить пассед
+
+                print(f'1s:{type(test_run_step.result)}')
+                print(f'2E:{type(calculated_result)}')
+                if test_run_step.result > calculated_result:
+                    #print(f'HEHEHEHEHHE:{test_run_step.result}')
                     calculated_result = test_run_step.result
+
             for i, instance in enumerate(context['test_postcondition_formset'].cleaned_data):
                 test_run_postcondition = self.fill_instance_of_data(instance, i, TestRunPostcondition)
                 test_run_postcondition.test_run = test_run

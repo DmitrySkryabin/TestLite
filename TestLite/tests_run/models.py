@@ -17,6 +17,36 @@ class ResultChoice(models.TextChoices):
     PASSED = 'P', _('Успешно')
     FAIL = 'F', _('Провал')
     ERROR = 'E', _('Ошибка')
+    BLOCKED = 'B',_('Заблокирован')
+
+    __ordering = [BLOCKED, PASSED, FAIL, ERROR]
+
+    def __lt__(self, other):
+        print('------------')
+        print(type(self))
+        print(type(other))
+        print('------------')
+        if isinstance(other, ResultChoice):
+            if self.__ordering.index(self.value) < self.__ordering.index(self.value):
+                return True
+            else:
+                return False
+            
+    
+    def __gt__(self, other):
+        if isinstance(other, ResultChoice):
+            if self.__ordering.index(self.value) < self.__ordering.index(self.value):
+                return False
+            else:
+                return True
+            
+
+    def __eq__(self, other):
+        if isinstance(other, ResultChoice):
+            if self.__ordering.index(self.value) == self.__ordering.index(self.value):
+                return True
+            else:
+                return False
 
 
 
