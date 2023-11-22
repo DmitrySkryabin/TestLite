@@ -1,0 +1,1 @@
+<QueryDict: {'csrfmiddlewaretoken': ['LrQHRCt8qu4xyGNk4nrgiFxLdt9LijywbHm0jnc2pNkCI38a93FL997nEl7U20c0'], 'result': ['E'], 'type': ['M'], 'form-0-result': ['', '', ''], 'form-0-id': ['5', '5', '2'], 'form-1-result': ['', ''], 'form-1-id': ['3', '4'], 'form-2-result': [''], 'form-2-id': ['4']}>
