@@ -20,22 +20,33 @@ class ResultChoice(models.TextChoices):
     BLOCKED = 'B',_('Заблокирован')
 
 
-    def its_bellow(self, other):
-        '''Метод для проверки значимости результата 
-        Так, например, результат ERROR приоритетнее чем FAIL
-        Возвращает True если other больше'''
-        order = {
+    def _get_order(self):
+        return {
             ResultChoice.BLOCKED[0]: 0,
             ResultChoice.PASSED[0]: 1,
             ResultChoice.FAIL[0]: 2,
             ResultChoice.ERROR[0]: 3
         }
+
+
+    def its_bellow(self, other):
+        '''Метод для проверки значимости результата 
+        Так, например, результат ERROR приоритетнее чем FAIL
+        Возвращает True если other больше'''
+        order = self._get_order()
         return order[self] < order[other]
+
+
+    def __lt__(self, other):
+        order = self._get_order()
+        return order[self] < order[other]
+
 
 
 class TypeOfRun(models.TextChoices):
     MANUAL = 'M', _('Ручное')
     AUTOMATED = 'A', _('Авто')
+
 
 
 class TestRun(models.Model):
