@@ -8,7 +8,7 @@ from django.contrib.auth import get_user_model
 from django.views.generic import DetailView, TemplateView, CreateView, FormView, TemplateView
 
 from tests.models import Test, TestPrecondition, TestPostcondition, TestStep
-from .models import ResultChoice, TestRun, ResultChoice, TestRunPrecondition, TestRunStep, TestRunPostcondition, result_choice_gt
+from .models import ResultChoice, TestRun, ResultChoice, TestRunPrecondition, TestRunStep, TestRunPostcondition
 from .forms import TestRunForm, TestResultsFormset
 
 
@@ -123,10 +123,6 @@ class TestRunFormView(TemplateView):
             record.result = instance['result']
 
         return record
-    
-
-    def assign_result_of_test_run(self, result):
-        result = result
 
 
     def post(self, requset, *args, **kwargs):
@@ -142,7 +138,7 @@ class TestRunFormView(TemplateView):
             test_run.type = 'M'
             #test_run.save()
 
-            calculated_result = ResultChoice.PASSED
+            calculated_result = ResultChoice.BLOCKED
 
             test_run_preconditions = []
             test_run_steps = []
@@ -158,14 +154,8 @@ class TestRunFormView(TemplateView):
                 test_run_step.test_run = test_run
                 test_run_steps.append(test_run_step)
 
-                print(f'test_run_step.result: {test_run_step.result}')
-                print(f'calculated_result: {calculated_result}')
-                if test_run_step.result > calculated_result:
-                    print('ITS TRUE')
-                    calculated_result = test_run_step.result
-
-                # if result_choice_gt(test_run_step.result, calculated_result):
-                #     calculated_result = test_run_step.result
+                if calculated_result.its_bellow(test_run_step.result):
+                    calculated_result = ResultChoice(test_run_step.result)
 
             for i, instance in enumerate(context['test_postcondition_formset'].cleaned_data):
                 test_run_postcondition = self.fill_instance_of_data(instance, i, TestRunPostcondition)

@@ -12,18 +12,6 @@ def invalid_name_validator(value):
         return value
 
 
-def result_choice_gt(value1, value2):
-    ordering = [
-        ResultChoice.BLOCKED[0],
-        ResultChoice.PASSED[0],
-        ResultChoice.FAIL[0],
-        ResultChoice.ERROR[0]
-    ]
-    if ordering.index(value1) > ordering.index(value2):
-        return True
-    else:
-        return False
-
 
 class ResultChoice(models.TextChoices):
     PASSED = 'P', _('Успешно')
@@ -31,33 +19,18 @@ class ResultChoice(models.TextChoices):
     ERROR = 'E', _('Ошибка')
     BLOCKED = 'B',_('Заблокирован')
 
-    
-    def __lt__(self, other):
-        if not isinstance(other, (str, ResultChoice)):
-            raise TypeError("Правый операнд должен быть str или ResultChoice")
-        print('IST __lt__')
-        ordering = [self.BLOCKED[0], self.PASSED[0], self.FAIL[0], self.ERROR[0]]
-        print(f'self: {self} index: {ordering.index(self)}')
-        print(f'other: {other} index: {ordering.index(other)}')
-        return ordering.index(self) < ordering.index(other if isinstance(other, str) else other.value)
 
-
-    
-    # def __gt__(self, other):
-    #     if isinstance(other, ResultChoice):
-    #         if self.__ordering.index(self.value) < self.__ordering.index(self.value):
-    #             return False
-    #         else:
-    #             return True
-            
-
-    # def __eq__(self, other):
-    #     if isinstance(other, ResultChoice):
-    #         if self.__ordering.index(self.value) == self.__ordering.index(self.value):
-    #             return True
-    #         else:
-    #             return False
-
+    def its_bellow(self, other):
+        '''Метод для проверки значимости результата 
+        Так, например, результат ERROR приоритетнее чем FAIL
+        Возвращает True если other больше'''
+        order = {
+            ResultChoice.BLOCKED[0]: 0,
+            ResultChoice.PASSED[0]: 1,
+            ResultChoice.FAIL[0]: 2,
+            ResultChoice.ERROR[0]: 3
+        }
+        return order[self] < order[other]
 
 
 class TypeOfRun(models.TextChoices):
