@@ -17,11 +17,11 @@ class ResultChoice(models.TextChoices):
     PASSED = 'P', _('Успешно')
     FAIL = 'F', _('Провал')
     ERROR = 'E', _('Ошибка')
-    BLOCKED = 'B',_('Заблокирован')
+    SKIPED = 'S',_('Пропущен')
 
     def _get_order(self):
         return {
-            ResultChoice.BLOCKED[0]: 0,
+            ResultChoice.SKIPED[0]: 0,
             ResultChoice.PASSED[0]: 1,
             ResultChoice.FAIL[0]: 2,
             ResultChoice.ERROR[0]: 3
@@ -62,6 +62,9 @@ class TestRun(models.Model):
 
     start_on = models.DateTimeField()
     stop_on = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f'Run: {self.test.name}'
 
 
 

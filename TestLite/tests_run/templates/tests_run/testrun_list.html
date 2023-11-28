@@ -1,0 +1,12 @@
+{% extends 'main.html' %}
+
+{% block content %}
+
+<a href="{% url 'tests:test_list' %}">Список тестов</a>
+<h2>Test runs</h2>
+
+{% for item in testrun_list %}
+    <a href="{% url 'tests_run:test_run_detail' item.id %}">{{ item }} </a><br>
+{% endfor %}
+
+{% endblock %}

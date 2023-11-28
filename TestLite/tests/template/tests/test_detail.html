@@ -2,10 +2,11 @@
 
 {% block content %}
 
+<h2>{{ data.test.name }} </h2>
+
 <a href="{% url 'tests:test_update' data.test.id %}">Редактировать</a> <br>
 <a href="{% url 'tests_run:execute' data.test.id %}">Выполнение</a> <br> <br>
 
-{{ data.test.name }} <br>
 {{ data.test.created_on }} <br>
 {{ data.test.author }} <br>
 {{ data.test.description }}

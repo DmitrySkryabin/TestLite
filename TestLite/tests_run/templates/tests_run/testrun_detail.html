@@ -1,0 +1,23 @@
+{% extends 'main.html' %}
+
+{% block content %}
+
+<a href="{% url 'tests_run:test_run_list' %}">Назад</a> <br>
+
+<h2>{{ data.test_run }}</h2>
+<b>Tester:</b>{{ data.test_run.tester }} <br>
+{{ data.test_run.get_result_display  }}
+
+<h3>Preconditions</h3>
+{% for item in data.test_run_preconditions %}
+    <div style="margin: 15px 0px;">{% include 'tests_run/includes/step_inner.html' %} </div>
+{% endfor %}
+<h3>Steps</h3>
+{% for item in data.test_run_steps %}
+    <div style="margin: 15px 0px;">{% include 'tests_run/includes/step_inner.html' %} </div>
+{% endfor %}
+<h3>Postconditions</h3>
+{% for item in data.test_run_postconditions %}
+    <div style="margin: 15px 0px;">{% include 'tests_run/includes/step_inner.html' %}</div>
+{% endfor %}
+{% endblock %}

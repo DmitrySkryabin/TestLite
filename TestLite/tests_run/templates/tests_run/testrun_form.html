@@ -1,8 +1,9 @@
 {% extends 'main.html' %}
 
 {% block content %}
+<a href="{% url 'tests:test_detail' test.id %}">Назад</a>
 
-<a href="{% url 'tests:test_detail' test_id %}">Назад</a>
+<h2>{{ test.name }}</h2>
 
 <form action="" method="post">
     <h2>Test run info</h2>

@@ -5,7 +5,9 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.forms import formset_factory, modelformset_factory
 from django.contrib.auth import get_user_model
-from django.views.generic import DetailView, TemplateView, CreateView, FormView, TemplateView
+from django.shortcuts import redirect
+from django.urls import reverse
+from django.views.generic import DetailView, TemplateView, CreateView, FormView, TemplateView, ListView
 
 from tests.models import Test, TestPrecondition, TestPostcondition, TestStep
 from .models import ResultChoice, TestRun, ResultChoice, TestRunPrecondition, TestRunStep, TestRunPostcondition
@@ -13,9 +15,32 @@ from .forms import TestRunForm, TestResultsFormset
 from .services import TestRunServices
 
 
+class TestRunListView(ListView):
+    '''Список всех ранов (прогонов) теста'''
+    queryset = TestRun.objects.all()
 
-class TestRunFormView(TemplateView):
-    template_name = 'tests_run/test_run_form.html'
+
+
+class TestRunDetailView(DetailView):
+    '''Детальная информация по прогону теста'''
+    context_object_name = 'data'
+    template_name = 'tests_run/testrun_detail.html'
+
+    def get_object(self):
+        test_run = TestRun.objects.filter(id=self.kwargs.get('id')).first()
+        print(test_run.get_result_display())
+        return {
+            'test_run':TestRun.objects.filter(id=self.kwargs.get('id')).first(),
+            'test_run_preconditions': TestRunPrecondition.objects.filter(test_run__id=self.kwargs.get('id')).all(),
+            'test_run_steps': TestRunStep.objects.filter(test_run__id=self.kwargs.get('id')).all(),
+            'test_run_postconditions': TestRunPostcondition.objects.filter(test_run__id=self.kwargs.get('id')).all()
+        }
+
+
+
+class TestRunCreateView(TemplateView):
+    '''Вью для сохранения экземпляра выполнения теста'''
+    template_name = 'tests_run/testrun_form.html'
 
 
     def get_context_data(self, *args, **kwargs):
@@ -35,80 +60,22 @@ class TestRunFormView(TemplateView):
             context['test_step_formset'] = TestResultsFormset(initial=test_steps, prefix='step', form_kwargs={'result_required': True})
             context['test_postcondition_formset'] = TestResultsFormset(initial=test_postconditions, prefix='postcondition')
 
-        context['test_id'] = test_id
+        context['test'] = Test.objects.filter(id=test_id).first()
         return context
-    
-    
-    # def fill_instance_of_data(self, instance, position, obj):
-    #     record = obj()
-    #     record.action = instance['action']
-    #     record.expected_result = instance['expected_result']
-    #     record.position = position
-
-    #     if instance['result'] == '':
-    #         record.result = 'P'
-    #     else:
-    #         record.result = instance['result']
-
-    #     return record
 
 
     def post(self, request, *args, **kwargs):
         context = self.get_context_data()
         if context['test_precondition_formset'].is_valid() and context['test_step_formset'].is_valid() and context['test_postcondition_formset'].is_valid():
             
-            TestRunServices.save_test_run(
-                test_id=context['test_id'],
+            test_run = TestRunServices.save_test_run(
+                test=context['test'],
                 user=request.user,
                 preconditions=context['test_precondition_formset'].cleaned_data,
                 steps=context['test_step_formset'].cleaned_data,
                 postconditions=context['test_postcondition_formset'].cleaned_data
             )
-            # тут нахуй убрать результат и тип пусть автоматом хуярит
-            # да и юзера нада ловить
-            
-            # test_run = TestRun()
-            # test_run.test = Test.objects.get(id=context['test_id'])
-            # test_run.start_on = datetime.now()
-            # test_run.type = 'M'
-            # #test_run.save()
 
-            # calculated_result = ResultChoice.BLOCKED
-
-            # test_run_preconditions = []
-            # test_run_steps = []
-            # test_run_postconditions = []
-
-            # for i, instance in enumerate(context['test_precondition_formset'].cleaned_data):
-            #     test_run_precondition = self.fill_instance_of_data(instance, i, TestRunPrecondition)
-            #     test_run_precondition.test_run = test_run
-            #     test_run_preconditions.append(test_run_precondition)
-
-            # for i, instance in enumerate(context['test_step_formset'].cleaned_data):
-            #     test_run_step = self.fill_instance_of_data(instance, i, TestRunStep)
-            #     test_run_step.test_run = test_run
-            #     test_run_steps.append(test_run_step)
-
-            #     if calculated_result.its_bellow(test_run_step.result):
-            #         calculated_result = ResultChoice(test_run_step.result)
-
-            # for i, instance in enumerate(context['test_postcondition_formset'].cleaned_data):
-            #     test_run_postcondition = self.fill_instance_of_data(instance, i, TestRunPostcondition)
-            #     test_run_postcondition.test_run = test_run
-            #     test_run_postconditions.append(test_run_postcondition)
-
-            # test_run.result = calculated_result
-            # test_run.tester = requset.user
-            # test_run.save()
-
-            # for precondition, step, postcondition in itertools.zip_longest(test_run_preconditions, test_run_steps, test_run_postconditions):
-            #     if precondition is not None:
-            #         precondition.save()
-            #     if step is not None:
-            #         step.save()
-            #     if postcondition is not None:
-            #         postcondition.save()
-
-            return HttpResponse('heh')
+            return redirect(reverse('tests_run:test_run_detail', kwargs={'id': test_run.id}))
         else:
             return self.render_to_response(self.get_context_data())
