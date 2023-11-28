@@ -6,7 +6,6 @@ from django.db import models
 from tests.models import Test
 from .models import TestRun, TestRunPrecondition, TestRunStep, TestRunPostcondition, ResultChoice, TypeOfRun
 
-
 class TestRunServices:
 
     @classmethod

@@ -36,7 +36,6 @@ class TestRunFormView(TemplateView):
             context['test_postcondition_formset'] = TestResultsFormset(initial=test_postconditions, prefix='postcondition')
 
         context['test_id'] = test_id
-
         return context
     
     

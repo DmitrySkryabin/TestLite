@@ -19,7 +19,6 @@ class ResultChoice(models.TextChoices):
     ERROR = 'E', _('Ошибка')
     BLOCKED = 'B',_('Заблокирован')
 
-
     def _get_order(self):
         return {
             ResultChoice.BLOCKED[0]: 0,
@@ -37,9 +36,14 @@ class ResultChoice(models.TextChoices):
         return order[self] < order[other]
 
 
-    def __lt__(self, other):
+    def __lt__(self, other): 
         order = self._get_order()
         return order[self] < order[other]
+    
+
+    def __gt__(self, other): 
+        order = self._get_order()
+        return order[self] > order[other]
 
 
 
