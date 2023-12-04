@@ -34,6 +34,13 @@ class Test(models.Model):
 
     def get_absolute_url(self):
         return reverse('tests:test_detail', kwargs={'id': self.id})
+
+
+
+class TestPlan(models.Model):
+    '''Набор тестов'''
+    name = models.CharField(max_length=200, validators=[invalid_name_validator])
+    tests = models.ManyToManyField(Test)
     
 
 
