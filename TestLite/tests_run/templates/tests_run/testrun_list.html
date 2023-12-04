@@ -4,17 +4,31 @@
 {% block content %}
 
 <h2>Test runs</h2>
-
+<table>
+    <tr>
+        <th>Дата окончания</th>
+        <th>Название</th>
+        <th>Тестовый набор</th>
+        <th>Результат</th>
+    </tr>
 {% for item in testrun_list %}
-
-    {% if item|isinstance:"list" %}
-        {% for inner_item in item %}
-            <span>__</span><a href="{% url 'tests_run:test_run_detail' inner_item.id %}">{{ inner_item }} </a> <span class="'result {{ inner_item.result }}">{{ inner_item.get_result_display }}</span> <br>
-        {% endfor %} <br>
-    {% else %}
-        <a href="{% url 'tests_run:test_run_detail' item.id %}">{{ item }} </a> <span class="'result {{ item.result }}">{{ item.get_result_display }}</span> <br>
-    {% endif %} <br>
-
+    <tr>
+        <td>{{ item.stop_on }}</td>
+        <td><a href="{% url 'tests_run:test_run_detail' item.id %}">{{ item }}</a></td>
+        <td><a href="">{% if item.test_run_suite is not None %}{{item.test_run_suite}}{% endif %}</a></td>
+        <td><span class="result {{ item.result }}">{{ item.get_result_display }}</span></td>
+    </tr>
 {% endfor %} 
+</table>
+
+<div class="pagination">
+    {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}">Назад</a>
+    {% endif %}
+    <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.</span>
+    {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}">Вперед</a>
+    {% endif %}
+</div>
 
 {% endblock %}

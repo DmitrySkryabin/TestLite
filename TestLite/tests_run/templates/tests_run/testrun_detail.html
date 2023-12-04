@@ -5,6 +5,7 @@
 <a href="{% url 'tests_run:test_run_list' %}">Назад</a> <br>
 
 <h2>{{ data.test_run }} <span class="result {{ data.test_run.result }}">{{ data.test_run.get_result_display  }}</span></h2> 
+<b>Test Suite:</b> <a href="">{{ data.test_run.test_run_suite }}</a> <br>
 <b>Tester:</b>{{ data.test_run.tester }} <br>
 <b>Duration:</b>{{ data.test_run.duration }}
 

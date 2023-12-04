@@ -20,34 +20,33 @@ from .services import TestRunServices
 
 class TestRunListView(ListView):
     '''Список всех ранов (прогонов) теста'''
-    # test_runs = TestRun.objects.all()
-    # for test_run in test_runs:
-    #     print(test_run)
-    # queryset = TestRun.objects.all()
+    queryset = TestRun.objects.all()
+    paginate_by = 20
     
-    def get_queryset(self):
-        import json
-        from django.core.serializers.json import DjangoJSONEncoder
-        print(json.dumps(list(TestRun.objects.values()), cls=DjangoJSONEncoder))
-        return TestRun.objects.all()
+    '''Тут не та логика уберем ее'''
+    # def get_queryset(self):
+    #     import json
+    #     from django.core.serializers.json import DjangoJSONEncoder
+    #     print(json.dumps(list(TestRun.objects.values()), cls=DjangoJSONEncoder))
+    #     return TestRun.objects.all()
     
-    def get_context_data(self, **kwargs):
-        context =  super().get_context_data(**kwargs)
-        tests_run = []
-        test_run_suite = None
-        boofer = []
-        for test_run in TestRun.objects.all():
-            if test_run.test_run_suite is not None:
-                boofer.append(test_run)
-                if test_run_suite != test_run.test_run_suite:
-                    tests_run.append(boofer)
-                    test_run_suite = test_run.test_run_suite
-                    boofer = []
-            else:
-                tests_run.append(test_run)
-        context['testrun_list'] = tests_run
+    # def get_context_data(self, **kwargs):
+    #     context =  super().get_context_data(**kwargs)
+    #     tests_run = []
+    #     test_run_suite = None
+    #     boofer = []
+    #     for test_run in TestRun.objects.all():
+    #         if test_run.test_run_suite is not None:
+    #             boofer.append(test_run)
+    #             if test_run_suite != test_run.test_run_suite:
+    #                 tests_run.append(boofer)
+    #                 test_run_suite = test_run.test_run_suite
+    #                 boofer = []
+    #         else:
+    #             tests_run.append(test_run)
+    #     context['testrun_list'] = tests_run
 
-        return context
+    #     return context
 
 
 

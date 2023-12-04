@@ -1,13 +1,25 @@
-
+html{
+    font-size: 20px;
+    padding: 0;
+    margin: 0;
+}
 .header{
-    width: 100%;;
+    width: 100%;
+    height: 100px;
+    background: #444;
 }
 
 .header ul{
+    height: 100%;
     display: flex;
-    align-items: flex-start;
+    align-items: center;
+}
+.header li{
+    list-style-type: none;
 }
 .header a{
+    color: white;
+    text-decoration: none;
     margin-right: 20px;
 }
 
@@ -25,4 +37,7 @@
 }
 .S{
     background: grey;
+}
+tr{
+    height: 40px;
 }

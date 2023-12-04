@@ -72,7 +72,7 @@ class TestRun(models.Model):
     stop_on = models.DateTimeField(auto_now=True)
 
     class Meta:
-        ordering = ['test_run_suite', '-start_on']
+        ordering = ['-stop_on']
 
     def __str__(self):
         return f'Run: {self.test.name} ({self.pk})'
