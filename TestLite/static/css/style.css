@@ -1,4 +1,28 @@
+
+.header{
+    width: 100%;;
+}
+
+.header ul{
+    display: flex;
+    align-items: flex-start;
+}
+.header a{
+    margin-right: 20px;
+}
+
 .result{
-    padding: 10px;
-    border-radius: 2px;
+    padding: 5px;
+    border-radius: 10px;
+    color: white;
+}
+
+.P{
+    background: green;
+}
+.E, .F{
+    background: red;
+}
+.S{
+    background: grey;
 }

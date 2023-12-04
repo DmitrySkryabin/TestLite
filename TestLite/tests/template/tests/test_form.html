@@ -9,27 +9,18 @@
     <h3>Test attributes</h3>
     <h4>Preconditions: </h4>
     {{ form_precondition_formset.management_form }}
-    <!-- {% for hidden in form_precondition_formset.hidden_fields %}
-    {{ hidden }}
-    {% endfor %} -->
     {% for precondition in form_precondition_formset %}
-    {{ precondition }} <br>
+        {{ precondition }} <br>
     {% endfor %}
     <h4>Steps: </h4>
     {{ form_step_formset.management_form }}
-    <!-- {% for hidden in form_step_formset.hidden_fields %}
-    {{ hidden }}
-    {% endfor %} -->
     {% for step in form_step_formset %}
-    {{ step }} <br>
+        {{ step }} <br>
     {% endfor %}
     <h4>Postconditions: </h4>
     {{ form_postcondition_formset.management_form }}
-    <!-- {% for hidden in form_postcondition_formset.hidden_fields %}
-    {{ hidden }}
-    {% endfor %} -->
     {% for postcondition in form_postcondition_formset %}
-    {{ postcondition }} <br>
+        {{ postcondition }} <br>
     {% endfor %}
     <button type="submit">Save</button>
 </form>

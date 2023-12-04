@@ -1,4 +1,3 @@
-from datetime import datetime
 from itertools import zip_longest
 
 from django.db import models, transaction
@@ -26,7 +25,7 @@ class TestRunServices:
 
 
     @classmethod
-    def save_test_run(cls, test, user, preconditions, steps, postconditions):
+    def save_test_run(cls, test, user, start_time, preconditions, steps, postconditions):
         '''Метод сохраняет результаты выполнения теста в базу
         test_id - id теста который выполняется'''
 
@@ -36,7 +35,7 @@ class TestRunServices:
         # Создаем тестовый прогон
         test_run = TestRun()
         test_run.test = test
-        test_run.start_on = datetime.now()
+        test_run.start_on = start_time
         test_run.type = TypeOfRun.MANUAL
         test_run.result = priority_result
         test_run.tester = user

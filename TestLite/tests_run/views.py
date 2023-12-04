@@ -1,5 +1,7 @@
 import itertools
-from datetime import datetime
+import datetime
+from typing import Any
+from django.db.models.query import QuerySet
 
 from django.shortcuts import render
 from django.http import HttpResponse
@@ -7,17 +9,45 @@ from django.forms import formset_factory, modelformset_factory
 from django.contrib.auth import get_user_model
 from django.shortcuts import redirect
 from django.urls import reverse
+from django.utils import timezone
 from django.views.generic import DetailView, TemplateView, CreateView, FormView, TemplateView, ListView
 
 from tests.models import Test, TestPrecondition, TestPostcondition, TestStep
-from .models import ResultChoice, TestRun, ResultChoice, TestRunPrecondition, TestRunStep, TestRunPostcondition
+from .models import ResultChoice, TestRun, ResultChoice, TestRunPrecondition, TestRunStep, TestRunPostcondition, TestRunSuite
 from .forms import TestRunForm, TestResultsFormset
 from .services import TestRunServices
 
 
 class TestRunListView(ListView):
     '''Список всех ранов (прогонов) теста'''
-    queryset = TestRun.objects.all()
+    # test_runs = TestRun.objects.all()
+    # for test_run in test_runs:
+    #     print(test_run)
+    # queryset = TestRun.objects.all()
+    
+    def get_queryset(self):
+        import json
+        from django.core.serializers.json import DjangoJSONEncoder
+        print(json.dumps(list(TestRun.objects.values()), cls=DjangoJSONEncoder))
+        return TestRun.objects.all()
+    
+    def get_context_data(self, **kwargs):
+        context =  super().get_context_data(**kwargs)
+        tests_run = []
+        test_run_suite = None
+        boofer = []
+        for test_run in TestRun.objects.all():
+            if test_run.test_run_suite is not None:
+                boofer.append(test_run)
+                if test_run_suite != test_run.test_run_suite:
+                    tests_run.append(boofer)
+                    test_run_suite = test_run.test_run_suite
+                    boofer = []
+            else:
+                tests_run.append(test_run)
+        context['testrun_list'] = tests_run
+
+        return context
 
 
 
@@ -28,9 +58,9 @@ class TestRunDetailView(DetailView):
 
     def get_object(self):
         test_run = TestRun.objects.filter(id=self.kwargs.get('id')).first()
-        print(test_run.get_result_display())
+        test_run.duration = datetime.timedelta(seconds=int((test_run.stop_on - test_run.start_on).total_seconds()))
         return {
-            'test_run':TestRun.objects.filter(id=self.kwargs.get('id')).first(),
+            'test_run':test_run,
             'test_run_preconditions': TestRunPrecondition.objects.filter(test_run__id=self.kwargs.get('id')).all(),
             'test_run_steps': TestRunStep.objects.filter(test_run__id=self.kwargs.get('id')).all(),
             'test_run_postconditions': TestRunPostcondition.objects.filter(test_run__id=self.kwargs.get('id')).all()
@@ -62,6 +92,12 @@ class TestRunCreateView(TemplateView):
 
         context['test'] = Test.objects.filter(id=test_id).first()
         return context
+    
+
+    def get(self, request, id):
+        '''Сохраняем время первого запуска при отркрытии страницы'''
+        request.session['time'] = str(timezone.now())
+        return super().get(request, id)
 
 
     def post(self, request, *args, **kwargs):
@@ -71,6 +107,7 @@ class TestRunCreateView(TemplateView):
             test_run = TestRunServices.save_test_run(
                 test=context['test'],
                 user=request.user,
+                start_time=request.session['time'],
                 preconditions=context['test_precondition_formset'].cleaned_data,
                 steps=context['test_step_formset'].cleaned_data,
                 postconditions=context['test_postcondition_formset'].cleaned_data

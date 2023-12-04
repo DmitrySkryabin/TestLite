@@ -1,9 +1,3 @@
 <span style="background: #dedede; padding: 5px; margin: 20px 5px;">{{ item.action }}</span>
 <span style="background: #dedede; padding: 5px; margin: 20px 5px;">{{ item.expected_result }}</span>
-{% if item.result == "P" %}
-<span style="background: green; color: white">PASSED</span>
-{% elif item.result == "S" %}
-<span style="background: #444; color: white">SKIPED</span>
-{% else %}
-<span style="background: red; color: white">{% if item.result == "E" %}ERROR{% elif item.result == "F" %}FAIL{% endif %}</span>
-{% endif %}
+<span class="result {{ item.result }}">{{ item.get_result_display }}</span>

@@ -4,9 +4,10 @@
 
 <a href="{% url 'tests_run:test_run_list' %}">Назад</a> <br>
 
-<h2>{{ data.test_run }}</h2>
+<h2>{{ data.test_run }} <span class="result {{ data.test_run.result }}">{{ data.test_run.get_result_display  }}</span></h2> 
 <b>Tester:</b>{{ data.test_run.tester }} <br>
-{{ data.test_run.get_result_display  }}
+<b>Duration:</b>{{ data.test_run.duration }}
+
 
 <h3>Preconditions</h3>
 {% for item in data.test_run_preconditions %}
