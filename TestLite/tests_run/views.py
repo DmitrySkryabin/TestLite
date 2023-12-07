@@ -13,7 +13,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.views.generic import DetailView, TemplateView, CreateView, FormView, TemplateView, ListView
 
-from tests.models import Test, TestPrecondition, TestPostcondition, TestStep
+from tests.models import Test, TestPlan, TestPrecondition, TestPostcondition, TestStep
 from .models import ResultChoice, TestRun, ResultChoice, TestRunPrecondition, TestRunStep, TestRunPostcondition, TestRunSuite
 from .forms import TestRunForm, TestResultsFormset
 from .services import TestRunServices
@@ -54,21 +54,38 @@ class TestRunListView(ListView):
 class TestSuiteRunView(TemplateView):
     template_name = 'tests_run/testsuite.html'
 
+
     def get_context_data(self, *args, **kwargs):
-        if kwargs.get('testrun_suite') is None:
-            print('getting')
-            testrun_suite = TestRunSuite.object.get(id=kwargs.get('id'))
-        else:
-            print('created_suite')
+        '''Получаем созданный тест суит или получем из базы возвращаем пары тест: и тестовый прогон'''
         context = super().get_context_data(**kwargs)
 
+        if kwargs.get('testrun_suite') is None:
+            testrun_suite = TestRunSuite.objects.get(id=kwargs.get('id'))
+        else:
+            testrun_suite = kwargs.get('testrun_suite')
+    
+        context['data'] = []
+        for item in testrun_suite.test_plan.tests.all():
+            context['data'].append({
+                'test': item,
+                'testrun': testrun_suite.testrun_set.filter(test=item).first()
+            })
+
+        return context
+
+
     def get(self, *args, **kwargs):
-        print('get')
-        print(self.kwargs.get('id'))
         if self.kwargs.get('id') is not None:
             return super().get(*args, **kwargs)
         else:
-            return super().get(testrun_suite=1, *args, **kwargs)
+            # Если пришел запрос без id то создаем обьект тест суита
+            testplan_id = self.request.GET.get('test_plan')
+            testrun_suite = TestRunSuite(
+                test_plan = TestPlan.objects.get(id=testplan_id),
+                test_runs = [item.id for item in TestPlan.objects.get(id=testplan_id).tests.all()]
+            )
+            testrun_suite.save()
+            return super().get(testrun_suite=testrun_suite, *args, **kwargs)
 
 
 class TestRunDetailView(DetailView):
