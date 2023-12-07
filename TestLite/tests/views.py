@@ -1,8 +1,12 @@
+from typing import Any
+from django.db import models
 from django.views.generic import DetailView, ListView, UpdateView, CreateView
+from django.shortcuts import redirect
+from django.urls import reverse
 from .services import TestServices
 from .forms import TestForm
-from .models import Test, TestPrecondition, TestStep, TestPostcondition
-from .views_mixins import TestCreateUpdateMixin
+from .models import Test, TestPlan, TestPrecondition, TestStep, TestPostcondition
+from .views_mixins import TestCreateUpdateMixin, TestPlanCreateUpdateMixin, TestPlanGetObjectMixin
 
 
 
@@ -18,11 +22,9 @@ class TestDetailView(DetailView):
         return data
 
 
-
 class TestListView(ListView):
     '''Список всех тестов'''
     queryset = TestServices.get_all_tests()
-
 
 
 class TestCreateView(TestCreateUpdateMixin ,CreateView):
@@ -31,12 +33,10 @@ class TestCreateView(TestCreateUpdateMixin ,CreateView):
     form_class=TestForm
 
 
-
 class TestUpdateView(TestCreateUpdateMixin, UpdateView):
     '''Редактирование теста и его атрибутов'''
     model = Test
     form_class = TestForm
-
 
     def _set_formsets(self):
         '''
@@ -49,6 +49,26 @@ class TestUpdateView(TestCreateUpdateMixin, UpdateView):
             form_postcondition_formset = self.form_postcondition_formset(queryset=TestPostcondition.objects.filter(test__id=self.kwargs.get('id')), prefix='postconditions')
         )
 
-
     def get_object(self):
         return Test.objects.filter(id=self.kwargs.get('id')).first()
+    
+
+class TestPlanListView(ListView):
+    '''Список всех тест планов'''
+    queryset = TestPlan.objects.all()
+    paginate_by = 20
+
+
+class TestPlanDetailView(TestPlanGetObjectMixin, DetailView):
+    '''Детальная информация по тест плану'''
+    pass
+
+
+class TestPlanCreateView(TestPlanCreateUpdateMixin, CreateView):
+    '''Создания тест плана (логика в миксине)'''
+    pass
+    
+
+class TestPlanUpdateView(TestPlanCreateUpdateMixin, TestPlanGetObjectMixin, UpdateView):
+    '''Редактирование тест плана'''
+    pass

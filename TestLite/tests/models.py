@@ -41,6 +41,9 @@ class TestPlan(models.Model):
     '''Набор тестов'''
     name = models.CharField(max_length=200, validators=[invalid_name_validator])
     tests = models.ManyToManyField(Test)
+
+    def __str__(self):
+        return self.name
     
 
 

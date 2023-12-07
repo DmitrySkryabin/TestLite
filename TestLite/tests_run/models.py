@@ -54,15 +54,14 @@ class TypeOfRun(models.TextChoices):
 
 class TestRunSuite(models.Model):
     '''Набор прогонов теста'''
-    pass
-    # def __str__(self):
-    #     return f'TestRunSuite{self.pk}'
+    test_runs = models.JSONField() # список всех тестов которые были обьеденены в тест сьют
+    test_plan = models.ForeignKey('tests.TestPlan', blank=True, null=True, on_delete=models.DO_NOTHING)
 
 
 
 class TestRun(models.Model):
     '''Информация по прогону теста'''
-    test_run_suite = models.ForeignKey(TestRunSuite, blank=False, null=True, on_delete=models.CASCADE) # Надо подумать как удалять
+    test_run_suite = models.ForeignKey(TestRunSuite, blank=True, null=True, on_delete=models.CASCADE) # Надо подумать как удалять
     test = models.ForeignKey('tests.Test', on_delete=models.CASCADE)
     result = models.CharField(choices=ResultChoice.choices, max_length=10)
     type = models.CharField(choices=TypeOfRun.choices, default=TypeOfRun.MANUAL, max_length=20)

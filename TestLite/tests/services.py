@@ -1,8 +1,6 @@
 from TestLite.utils import query_debugger
 from .models import Test, TestPostcondition, TestPrecondition, TestStep
 from django.forms import modelformset_factory
-from django.forms.models import BaseModelForm
-from django.db.models.query import QuerySet
 from .forms import TestStepForm, TestPostconditionForm, TestPreconditionForm
 
 

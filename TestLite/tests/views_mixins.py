@@ -2,8 +2,8 @@ from dataclasses import dataclass
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.forms import modelformset_factory
-from .models import TestPrecondition, TestStep, TestPostcondition
-from .forms import TestPreconditionForm, TestStepForm, TestPostconditionForm
+from .models import TestPrecondition, TestPlan, TestStep, TestPostcondition
+from .forms import TestPreconditionForm, TestStepForm, TestPostconditionForm, TestPlanForm
 
 
 class TestCreateUpdateMixin:
@@ -66,3 +66,21 @@ class TestCreateUpdateMixin:
             return redirect(reverse('tests:test_detail', kwargs={'id': test.id}))
         else:
             return self.render_to_response(self.get_context_data(form=form))
+        
+
+
+class TestPlanCreateUpdateMixin:
+    '''Общий миксин для создания и редактирования тест плана'''
+    model = TestPlan
+    form_class = TestPlanForm
+
+    def get_success_url(self):
+        return reverse('tests:test_plan_detail', kwargs={'test_plan_id': self.object.id})
+    
+
+
+class TestPlanGetObjectMixin:
+    '''Миксин дл яполучения обьчект тест плана'''
+    def get_object(self):
+        test_plan = TestPlan.objects.get(id=self.kwargs.get('test_plan_id'))
+        return test_plan

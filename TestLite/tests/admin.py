@@ -3,6 +3,7 @@ from .models import *
 
 # Register your models here.
 admin.site.register(Test)
+admin.site.register(TestPlan)
 admin.site.register(TestStep)
 admin.site.register(TestPrecondition)
 admin.site.register(TestPostcondition)

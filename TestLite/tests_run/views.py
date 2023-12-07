@@ -1,6 +1,7 @@
 import itertools
 import datetime
 from typing import Any
+from django import http
 from django.db.models.query import QuerySet
 
 from django.shortcuts import render
@@ -50,6 +51,26 @@ class TestRunListView(ListView):
 
 
 
+class TestSuiteRunView(TemplateView):
+    template_name = 'tests_run/testsuite.html'
+
+    def get_context_data(self, *args, **kwargs):
+        if kwargs.get('testrun_suite') is None:
+            print('getting')
+            testrun_suite = TestRunSuite.object.get(id=kwargs.get('id'))
+        else:
+            print('created_suite')
+        context = super().get_context_data(**kwargs)
+
+    def get(self, *args, **kwargs):
+        print('get')
+        print(self.kwargs.get('id'))
+        if self.kwargs.get('id') is not None:
+            return super().get(*args, **kwargs)
+        else:
+            return super().get(testrun_suite=1, *args, **kwargs)
+
+
 class TestRunDetailView(DetailView):
     '''Детальная информация по прогону теста'''
     context_object_name = 'data'
@@ -73,6 +94,7 @@ class TestRunCreateView(TemplateView):
 
 
     def get_context_data(self, *args, **kwargs):
+        test_plan_id = self.request.GET.get('test_plan')
         context = super().get_context_data(*args, **kwargs)
         test_id = self.kwargs.get('id')
 
@@ -100,18 +122,27 @@ class TestRunCreateView(TemplateView):
 
 
     def post(self, request, *args, **kwargs):
+        '''Сохраянем тестовый прогон и определяем куда перенаправить пользователя'''
+
+        # Проверяем что выполнение вызвано из тест плана
+        test_plan_id = self.request.GET.get('test_plan')
+        non_stop_executing = bool(self.request.GET.get('non_stop'))
+
         context = self.get_context_data()
         if context['test_precondition_formset'].is_valid() and context['test_step_formset'].is_valid() and context['test_postcondition_formset'].is_valid():
-            
             test_run = TestRunServices.save_test_run(
                 test=context['test'],
+                test_plan_id=test_plan_id,
                 user=request.user,
                 start_time=request.session['time'],
                 preconditions=context['test_precondition_formset'].cleaned_data,
                 steps=context['test_step_formset'].cleaned_data,
                 postconditions=context['test_postcondition_formset'].cleaned_data
             )
-
-            return redirect(reverse('tests_run:test_run_detail', kwargs={'id': test_run.id}))
+            if non_stop_executing:
+                TestRunServices.get_next_test_in_test_plan(test_plan_id, test_run.test_run_suite.id)
+                return redirect(reverse('tests_run:execute', kwargs={'id': test_run.id}))
+            else:
+                return redirect(reverse('tests_run:test_run_detail', kwargs={'id': test_run.id}))
         else:
             return self.render_to_response(self.get_context_data())

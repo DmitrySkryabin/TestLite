@@ -1,0 +1,21 @@
+{% extends 'main.html' %}
+
+{%block content %}
+        <a href="{% url 'tests:test_plan_list' %}">Назад</a> <br> <br>
+        <a href="{% url 'tests:test_plan_update' object.id %}">Редактировать</a> <br>
+        <a href="{% url 'tests_run:execute' object.tests.all.first.id %}?test_plan={{ object.id }}&non_stop=true">Общее выполнение (ручное)</a> <br> 
+    <b>Name: </b>{{ object.name }} <br>
+    <b>Tests in test plan:</b> <br>
+    <table>
+        <tr>
+            <th>Название</th>
+            <th></th>
+        </tr>
+        {% for test in object.tests.all %}
+            <tr>
+                <td>{{ test }}</td>
+                <td><a href="{% url 'tests_run:execute' test.id %}?test_plan={{ object.id }}">Выполнить</a></td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock %}

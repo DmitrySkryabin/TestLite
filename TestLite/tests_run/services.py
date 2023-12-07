@@ -2,8 +2,8 @@ from itertools import zip_longest
 
 from django.db import models, transaction
 
-from tests.models import Test
-from .models import TestRun, TestRunPrecondition, TestRunStep, TestRunPostcondition, ResultChoice, TypeOfRun
+from tests.models import TestPlan
+from .models import TestRun, TestRunPrecondition, TestRunStep, TestRunPostcondition, ResultChoice, TypeOfRun, TestRunSuite
 
 class TestRunServices:
 
@@ -22,10 +22,18 @@ class TestRunServices:
             record.result = instance['result']
 
         return record
+    
+
+    @classmethod
+    def get_next_test_in_test_plan(cls, test_plan_id, tests_suite_id):
+        test_plan = TestPlan.objects.get(id=test_plan_id)
+        tests_suite =[item.test for item in TestRunSuite.objects.get(id=tests_suite_id).testrun_set.all()]
+        print(test_plan)
+        print(tests_suite)
 
 
     @classmethod
-    def save_test_run(cls, test, user, start_time, preconditions, steps, postconditions):
+    def save_test_run(cls, test, test_plan_id, user, start_time, preconditions, steps, postconditions):
         '''Метод сохраняет результаты выполнения теста в базу
         test_id - id теста который выполняется'''
 
@@ -39,6 +47,14 @@ class TestRunServices:
         test_run.type = TypeOfRun.MANUAL
         test_run.result = priority_result
         test_run.tester = user
+
+        # Если мы пришли из тест плана то создаем или получем тест суит для этого набора тестов
+        if test_plan_id is not None:
+            test_run_suite = TestRunSuite.objects.get_or_create(
+                test_plan=TestPlan.objects.get(id=test_plan_id)
+            )
+            test_run_suite.save()
+            test_run.test_run_suite = test_run_suite # Записываем в тест ран тест суит
 
         # Сохраняем тестовый прогон и его атрибуты в рамках одной транзакции
         with transaction.atomic():
