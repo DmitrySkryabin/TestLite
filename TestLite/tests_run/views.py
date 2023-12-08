@@ -62,10 +62,16 @@ class TestSuiteRunView(TemplateView):
         testrun_suite = TestRunSuite.objects.get(id=kwargs.get('id'))
         context['testrun_suite'] = testrun_suite  
         context['data'] = []
+        
+        find_start_test_id = False
         for item in testrun_suite.test_plan.tests.all():
+            testrun = testrun_suite.testrun_set.filter(test=item).first()
+            if (testrun is None) and (not find_start_test_id):
+                context['start_test_id'] = item.id # id для первого теста в массовом выполнении
+                find_start_test_id = True
             context['data'].append({
                 'test': item,
-                'testrun': testrun_suite.testrun_set.filter(test=item).first()
+                'testrun': testrun
             })
 
         return context
@@ -152,8 +158,11 @@ class TestRunCreateView(TemplateView):
                 postconditions=context['test_postcondition_formset'].cleaned_data
             )
             if non_stop_executing:
-                TestRunServices.get_next_test_in_test_plan(testrun_suite_id, test_run.test_run_suite.id)
-                return redirect(reverse('tests_run:execute', kwargs={'id': test_run.id}))
+                not_runned_tests = TestRunServices.get_not_runned_tests(testrun_suite_id)
+                if len(not_runned_tests) == 0:
+                    return redirect(reverse('tests_run:test_suite', kwargs={'id': testrun_suite_id}))
+                else:
+                    return redirect(reverse('tests_run:execute', kwargs={'id': not_runned_tests[0]}) + f'?testrun_suite={testrun_suite_id}&non_stop=true')
             else:
                 return redirect(reverse('tests_run:test_run_detail', kwargs={'id': test_run.id}))
         else:

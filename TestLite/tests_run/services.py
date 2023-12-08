@@ -25,11 +25,11 @@ class TestRunServices:
     
 
     @classmethod
-    def get_next_test_in_test_plan(cls, test_plan_id, tests_suite_id):
-        test_plan = TestPlan.objects.get(id=test_plan_id)
-        tests_suite =[item.test for item in TestRunSuite.objects.get(id=tests_suite_id).testrun_set.all()]
-        print(test_plan)
-        print(tests_suite)
+    def get_not_runned_tests(cls, testrun_suite_id) -> list:
+        '''Получаем тесты из тестплана которые не были запущены в рамках нынешненго тест суита'''
+        testrun_suite = TestRunSuite.objects.get(id=testrun_suite_id)
+        testruns = [item.test.id for item in TestRun.objects.filter(test_run_suite=testrun_suite)] # выполенные тесты
+        return list(set(testrun_suite.test_runs) - set(testruns)) # Отнимаем от списка всех тестов все выполенные
 
 
     @classmethod
