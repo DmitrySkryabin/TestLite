@@ -41,3 +41,9 @@ html{
 tr{
     height: 40px;
 }
+
+.inactive-link {
+    pointer-events: none;
+    cursor: default;
+    color: #444;
+ }

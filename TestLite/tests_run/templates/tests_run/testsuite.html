@@ -11,9 +11,9 @@
     {% for item in data %}
         <tr>
             <td>{{ item.test }}</td>
-            <td>{% if item.test_run is None %}<span class="result S">IN PROGRESS</span>{% else %}<span class="result P">DONE</span>{% endif %}</td>
-            <td>{% if item.test_run is not None %}<a href="{% url 'tests_run:run' item.test_run.id %}">{{ item.testrun }}</a>{% endif %}</td>
-            <td><a href="{% url 'tests_run:execute' item.test.id %}">Выполнить</a></td>
+            <td>{% if item.testrun is None %}<span class="result S">IN PROGRESS</span>{% else %}<span class="result P">DONE</span>{% endif %}</td>
+            <td>{% if item.testrun is not None %}<a href="{% url 'tests_run:test_run_detail' item.testrun.id %}">{{ item.testrun }}</a> <span class="result {{ item.testrun.result }}">{{ item.testrun.get_result_display }}</span>{% endif %}</td>
+            <td><a href="{% if item.testrun is None %}{% url 'tests_run:execute' item.test.id %}?testrun_suite={{ testrun_suite.id }}{% endif %}" {% if item.testrun is not None %}class="inactive-link"{% endif %}>Выполнить</a></td>
         </tr>
     {% endfor %}
 </table>

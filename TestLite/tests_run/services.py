@@ -33,7 +33,7 @@ class TestRunServices:
 
 
     @classmethod
-    def save_test_run(cls, test, test_plan_id, user, start_time, preconditions, steps, postconditions):
+    def save_test_run(cls, test, testrun_suite_id, user, start_time, preconditions, steps, postconditions):
         '''Метод сохраняет результаты выполнения теста в базу
         test_id - id теста который выполняется'''
 
@@ -49,12 +49,9 @@ class TestRunServices:
         test_run.tester = user
 
         # Если мы пришли из тест плана то создаем или получем тест суит для этого набора тестов
-        if test_plan_id is not None:
-            test_run_suite = TestRunSuite.objects.get_or_create(
-                test_plan=TestPlan.objects.get(id=test_plan_id)
-            )
-            test_run_suite.save()
-            test_run.test_run_suite = test_run_suite # Записываем в тест ран тест суит
+        print(testrun_suite_id)
+        if testrun_suite_id is not None:
+            test_run.test_run_suite = TestRunSuite.objects.get(id=testrun_suite_id) # Записываем в тест ран тест суит
 
         # Сохраняем тестовый прогон и его атрибуты в рамках одной транзакции
         with transaction.atomic():

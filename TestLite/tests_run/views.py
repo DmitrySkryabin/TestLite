@@ -52,18 +52,15 @@ class TestRunListView(ListView):
 
 
 class TestSuiteRunView(TemplateView):
+    '''Отображение связанное с тест суитом. Либо создаем и отображаем или просто отображаем'''
     template_name = 'tests_run/testsuite.html'
 
-
     def get_context_data(self, *args, **kwargs):
-        '''Получаем созданный тест суит или получем из базы возвращаем пары тест: и тестовый прогон'''
+        '''Получем тест суит и сопоставляеим их с тестами'''
         context = super().get_context_data(**kwargs)
 
-        if kwargs.get('testrun_suite') is None:
-            testrun_suite = TestRunSuite.objects.get(id=kwargs.get('id'))
-        else:
-            testrun_suite = kwargs.get('testrun_suite')
-    
+        testrun_suite = TestRunSuite.objects.get(id=kwargs.get('id'))
+        context['testrun_suite'] = testrun_suite  
         context['data'] = []
         for item in testrun_suite.test_plan.tests.all():
             context['data'].append({
@@ -85,7 +82,7 @@ class TestSuiteRunView(TemplateView):
                 test_runs = [item.id for item in TestPlan.objects.get(id=testplan_id).tests.all()]
             )
             testrun_suite.save()
-            return super().get(testrun_suite=testrun_suite, *args, **kwargs)
+            return redirect(reverse('tests_run:test_suite', kwargs={'id': testrun_suite.id}))
 
 
 class TestRunDetailView(DetailView):
@@ -109,9 +106,7 @@ class TestRunCreateView(TemplateView):
     '''Вью для сохранения экземпляра выполнения теста'''
     template_name = 'tests_run/testrun_form.html'
 
-
     def get_context_data(self, *args, **kwargs):
-        test_plan_id = self.request.GET.get('test_plan')
         context = super().get_context_data(*args, **kwargs)
         test_id = self.kwargs.get('id')
 
@@ -142,14 +137,14 @@ class TestRunCreateView(TemplateView):
         '''Сохраянем тестовый прогон и определяем куда перенаправить пользователя'''
 
         # Проверяем что выполнение вызвано из тест плана
-        test_plan_id = self.request.GET.get('test_plan')
+        testrun_suite_id = self.request.GET.get('testrun_suite')
         non_stop_executing = bool(self.request.GET.get('non_stop'))
 
         context = self.get_context_data()
         if context['test_precondition_formset'].is_valid() and context['test_step_formset'].is_valid() and context['test_postcondition_formset'].is_valid():
             test_run = TestRunServices.save_test_run(
                 test=context['test'],
-                test_plan_id=test_plan_id,
+                testrun_suite_id=testrun_suite_id,
                 user=request.user,
                 start_time=request.session['time'],
                 preconditions=context['test_precondition_formset'].cleaned_data,
@@ -157,7 +152,7 @@ class TestRunCreateView(TemplateView):
                 postconditions=context['test_postcondition_formset'].cleaned_data
             )
             if non_stop_executing:
-                TestRunServices.get_next_test_in_test_plan(test_plan_id, test_run.test_run_suite.id)
+                TestRunServices.get_next_test_in_test_plan(testrun_suite_id, test_run.test_run_suite.id)
                 return redirect(reverse('tests_run:execute', kwargs={'id': test_run.id}))
             else:
                 return redirect(reverse('tests_run:test_run_detail', kwargs={'id': test_run.id}))
