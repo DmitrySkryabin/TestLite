@@ -1,6 +1,7 @@
 {% extends 'main.html' %}
 
 {% block content %}
+<a href="{% url 'tests:test_plan_detail' testrun_suite.test_plan.id %}">{{ testrun_suite.test_plan }}</a>
 {% if start_test_id %}
 <a href="{% url 'tests_run:execute' start_test_id %}?testrun_suite={{ testrun_suite.id }}&non_stop=true">Массовое выполнение</a>
 {% endif %}

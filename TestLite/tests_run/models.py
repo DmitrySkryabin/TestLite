@@ -63,6 +63,7 @@ class TestRun(models.Model):
     '''Информация по прогону теста'''
     test_run_suite = models.ForeignKey(TestRunSuite, blank=True, null=True, on_delete=models.CASCADE) # Надо подумать как удалять
     test = models.ForeignKey('tests.Test', on_delete=models.CASCADE)
+    data = models.TextField(blank=False, null=True) # Какие данные были использованы для этого теста
     result = models.CharField(choices=ResultChoice.choices, max_length=10)
     type = models.CharField(choices=TypeOfRun.choices, default=TypeOfRun.MANUAL, max_length=20)
     tester = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
@@ -74,7 +75,9 @@ class TestRun(models.Model):
         ordering = ['-stop_on']
 
     def __str__(self):
-        return f'Run: {self.test.name} ({self.pk})'
+        if self.data is None:
+            return f'Run: {self.test.name}-{self.pk}'
+        return f'Run: {self.test.name}-{self.pk}[{self.data[:10]}]'
 
 
 

@@ -9,7 +9,8 @@ class TestForm(forms.ModelForm):
         fields = [
             'name',
             'description',
-            'priority'
+            'priority',
+            'data'
         ]
 
 

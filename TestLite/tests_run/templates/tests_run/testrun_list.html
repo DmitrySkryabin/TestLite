@@ -15,7 +15,7 @@
     <tr>
         <td>{{ item.stop_on }}</td>
         <td><a href="{% url 'tests_run:test_run_detail' item.id %}">{{ item }}</a></td>
-        <td><a href="">{% if item.test_run_suite is not None %}{{item.test_run_suite}}{% endif %}</a></td>
+        <td>{% if item.test_run_suite is not None %}<a href="{% url 'tests_run:test_suite' item.test_run_suite.id %}">{{item.test_run_suite}}</a>{% endif %}</td>
         <td><span class="result {{ item.result }}">{{ item.get_result_display }}</span></td>
     </tr>
 {% endfor %} 
