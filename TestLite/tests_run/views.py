@@ -65,13 +65,13 @@ class TestSuiteRunView(TemplateView):
         
         find_start_test_id = False
         for item in testrun_suite.test_plan.tests.all():
-            testrun = testrun_suite.testrun_set.filter(test=item).first()
-            if (testrun is None) and (not find_start_test_id):
+            testruns = testrun_suite.testrun_set.filter(test=item).all()
+            if (testruns is None) and (not find_start_test_id):
                 context['start_test_id'] = item.id # id для первого теста в массовом выполнении
                 find_start_test_id = True
             context['data'].append({
                 'test': item,
-                'testrun': testrun
+                'testruns': testruns if len(testruns) != 0  else None
             })
 
         return context
@@ -167,3 +167,12 @@ class TestRunCreateView(TemplateView):
                 return redirect(reverse('tests_run:test_run_detail', kwargs={'id': test_run.id}))
         else:
             return self.render_to_response(self.get_context_data())
+        
+
+
+class SimpleLogicAPI():
+    pass
+
+
+def simple_basic_api(request):
+    return HttpResponse('Simple HEH')

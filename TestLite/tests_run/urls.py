@@ -10,5 +10,6 @@ urlpatterns = [
     # два варианта как можно отобразить тест суит (в первый раз: создать отобразить) и во второй просто отобразить
     path('test_suite', views.TestSuiteRunView.as_view(), name='test_suite'),
     path('test_suite/<int:id>', views.TestSuiteRunView.as_view(), name='test_suite'),
+    path('auto_execute', views.simple_basic_api)
 ]
 

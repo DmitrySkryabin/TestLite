@@ -16,7 +16,14 @@
         <tr>
             <td>{{ item.test }}</td>
             <td>{% if item.testrun is None %}<span class="result S">IN PROGRESS</span>{% else %}<span class="result P">DONE</span>{% endif %}</td>
-            <td>{% if item.testrun is not None %}<a href="{% url 'tests_run:test_run_detail' item.testrun.id %}">{{ item.testrun }}</a> <span class="result {{ item.testrun.result }}">{{ item.testrun.get_result_display }}</span>{% endif %}</td>
+            <td>{% if item.testruns is not None %}
+                    {% for testrun in item.testruns %}
+                        <tr>
+                            heh
+                            <td>{{ testrun }}</td>
+                        </tr>
+                    {% endfor %}
+                {% endif %}</td>
             <td><a href="{% if item.testrun is None %}{% url 'tests_run:execute' item.test.id %}?testrun_suite={{ testrun_suite.id }}{% endif %}" {% if item.testrun is not None %}class="inactive-link"{% endif %}>Выполнить</a></td>
         </tr>
     {% endfor %}
