@@ -2,6 +2,7 @@
 
 {% block content %}
 <a href="{% url 'tests:test_plan_detail' testrun_suite.test_plan.id %}">{{ testrun_suite.test_plan }}</a>
+<br>
 {% if start_test_id %}
 <a href="{% url 'tests_run:execute' start_test_id %}?testrun_suite={{ testrun_suite.id }}&non_stop=true">Массовое выполнение</a>
 {% endif %}
@@ -10,21 +11,29 @@
         <th>Тест</th>
         <th>Статус</th>
         <th>Тестовый прогон</th>
+        <th>Результат</th>
         <th></th>
     </tr>
     {% for item in data %}
         <tr>
+        {% if item.testruns is not None %}
+            <td rowspan="{{ item.testruns.count }}">{{ item.test }}</td>
+            <td rowspan="{{ item.testruns.count }}" class="result P">DONE</td>
+            <td>{{ item.testruns.0 }}</td>
+            <td class="result {{ item.testruns.0.result }}">{{ item.testruns.0.get_result_display }}</td>
+            {% for testrun in item.testruns|slice:"1:" %}
+                <tr>
+                    <td>{{ testrun }}</td>
+                    <td class="result {{ testrun.result }}">{{ testrun.get_result_display }}</td>
+                </tr>
+            {% endfor %}
+        {% else %}
             <td>{{ item.test }}</td>
-            <td>{% if item.testrun is None %}<span class="result S">IN PROGRESS</span>{% else %}<span class="result P">DONE</span>{% endif %}</td>
-            <td>{% if item.testruns is not None %}
-                    {% for testrun in item.testruns %}
-                        <tr>
-                            heh
-                            <td>{{ testrun }}</td>
-                        </tr>
-                    {% endfor %}
-                {% endif %}</td>
+            <td><span class="result S">IN PROGRESS</span></td>
+            <td></td>
+            <td></td>
             <td><a href="{% if item.testrun is None %}{% url 'tests_run:execute' item.test.id %}?testrun_suite={{ testrun_suite.id }}{% endif %}" {% if item.testrun is not None %}class="inactive-link"{% endif %}>Выполнить</a></td>
+        {% endif %}
         </tr>
     {% endfor %}
 </table>
