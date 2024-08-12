@@ -3,7 +3,7 @@ from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
 
-
+test = 'test'
 
 def invalid_name_validator(value):
     if 'invalid' in value:
