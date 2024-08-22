@@ -2,8 +2,10 @@ from typing import Any
 from django.db.models.base import Model as Model
 from django.db.models.query import QuerySet
 from django.shortcuts import render
-from django.views.generic import ListView, DetailView
+from django.views.generic import ListView, DetailView, UpdateView
+from django.forms import modelformset_factory
 from .models import Project, TestCase, TestStep
+from .forms import TestStepForm
 
 # Create your views here.
 
@@ -27,10 +29,29 @@ class TestCaseDetailView(DetailView):
     template_name = 'TMS/testcase_detail.html'
     
     def get_object(self, queryset: QuerySet[Any] | None = ...) -> Model:
-        obj = TestCase.objects.get(pk=self.kwargs.get('id'))
+        obj = TestCase.objects.get(pk=self.kwargs.get('pk'))
         return obj
     
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
         context['testcase_steps'] = TestStep.objects.filter(test_case=self.object)
+        return context
+
+
+class TestCaseUpdateView(UpdateView):
+    model = TestCase
+    fields = [
+        'name',
+        'description',
+        'preconditions',
+        'postconditions',
+        'priority',
+        'parameters',
+    ]
+
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        context =  super().get_context_data(**kwargs)
+        testcase_step_formset = modelformset_factory(form=TestStepForm, model=TestStep)
+        context['testcase_step_formset'] = testcase_step_formset(queryset=TestStep.objects.filter(test_case=self.object))
+        
         return context

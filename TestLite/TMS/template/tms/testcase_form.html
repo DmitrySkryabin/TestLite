@@ -1,0 +1,40 @@
+{% extends 'main.html' %}
+
+{% block content %}
+<form action="">
+    {% csrf_token %}
+    <div class="form-con">
+        <div class="left">
+            {{ form.name }}
+            {{ form.description }}
+            <div class="teststeps">
+                {% for teststep in testcase_step_formset %}
+                    <div class="teststep">
+                        {{ teststep.action }}
+                        {{ teststep.expected_result }}
+                        {{ teststep.position.as_hidden }}
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="right">
+            <div>
+                {{ form.priority.label }}
+                {{ form.priority }}
+            </div>
+            <fieldset class="con">
+                <legend>{{ form.preconditions.label }}</legend>
+                {{ form.preconditions }}
+            </fieldset>
+            <fieldset class="con">
+                <legend>{{ form.postconditions.label }}</legend>
+                {{ form.postconditions }}
+            </fieldset>
+            <fieldset class="con">
+                <legend>{{ form.parameters.label }}</legend>
+                {{ form.parameters }}
+            </fieldset>
+        </div>
+    </div>
+</form>
+{% endblock %}

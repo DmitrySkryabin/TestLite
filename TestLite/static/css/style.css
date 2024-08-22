@@ -2,6 +2,10 @@ html {
     font-size: 20px;
     padding: 0;
     margin: 0;
+    font-family: "Rubik", sans-serif;
+    font-optical-sizing: auto;
+    /* font-weight: <weight>;
+    font-style: normal; */
 }
  table, th, td {
     /* border: 1px solid black; */
@@ -17,4 +21,61 @@ html {
 .parametrs-conditions p{
     padding: 0;
     margin: 10px 0 ;
+}
+.green-btn {
+    padding: 10px;
+    font-size: 20px;
+    color: white;
+    background: green;
+    border-radius: 5px;
+    width: 100%;
+}
+.form-con {
+    display: flex;
+    height: 100vh;
+}  
+.form-con textarea {
+    width: 100%;
+    font-size: 20px;
+    resize: vertical;
+    font-family: "Rubik", sans-serif;
+    font-optical-sizing: auto;
+} 
+.form-con select {
+    font-size: 20px;
+    font-family: "Rubik", sans-serif;
+    font-optical-sizing: auto;
+}
+.form-con input {
+    font-size: 24px;
+    font-family: "Rubik", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: bold;
+}
+.left input {
+    margin-top: 20px;
+}
+.left textarea {
+    margin-top: 20px;
+}
+.left {
+    width: 70%;
+    padding: 5px;
+}
+.right {
+    width: 30%;
+    height: 100%;
+    padding: 5px;
+}
+.con {
+    padding: 5px;
+    display: flex;
+    flex-direction: column;
+}
+.teststep {
+    display: flex;
+}
+.teststep textarea {
+    max-width: 90%;
+    min-height: 100px;
 }
