@@ -38,7 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    'test',
+    'TMS'
 ]
 
 MIDDLEWARE = [
@@ -58,7 +58,7 @@ TEMPLATES = [
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
             Path.joinpath(BASE_DIR, 'template'),
-            Path.joinpath(BASE_DIR, 'tests/template')
+            Path.joinpath(BASE_DIR, 'TMS/template')
         ],
         'APP_DIRS': True,
         'OPTIONS': {

@@ -22,8 +22,16 @@ class TYPE(models.TextChoices):
     AUTO = 'A', _('Авто')
 
 
+class Project(models.Model):
+    '''Проект к которому привязаны все тест кейсы'''
+    name = models.CharField(max_length=200)
+
+    def __str__(self):
+        return f'{self.name}'
+
 
 class BaseTestStep(models.Model):
+    '''Абстрактная модель для шагов теста'''
     action = models.TextField()
     expected_result = models.TextField()
     position = models.IntegerField()
@@ -37,12 +45,16 @@ class TestCase(models.Model):
     name = models.CharField(max_length=200)
     description = models.TextField()
     preconditions = models.TextField() # Предусловия
-    pastconditions = models.TextField() # Постусловия
+    postconditions = models.TextField() # Постусловия
     priority = models.CharField(choices=PRIORITY, max_length=20)
     parameters = models.JSONField() # Данные для тестов
     version = models.IntegerField()
 
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
     author = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f'{self.name}'
 
 
 
@@ -50,11 +62,14 @@ class TestStep(BaseTestStep):
     '''Модель с шагами тест кейса'''
     test_case = models.ForeignKey(TestCase, on_delete=models.CASCADE)
 
+    def __str__(self):
+        return f'{self.test_case}:{self.pk}'
+
 
 
 class TestCaseRun(models.Model):
     '''Модель с запуском тест кейса'''
-    name = models.CharField(max_length=200)
+    # name = models.CharField(max_length=200)
     start_time = models.DateTimeField()
     duration = models.FloatField()
     type = models.TextField(choices=TYPE, max_length=20) # Тип запуска 
@@ -62,23 +77,40 @@ class TestCaseRun(models.Model):
 
     test_case = models.ForeignKey(TestCase, on_delete=models.CASCADE)
 
+    def __str__(self):
+        return f'{self.test_case}:{self.pk}::{self.status}'
+
 
 
 class TestStepRun(BaseTestStep):
+    '''Модель с выполненными шагами'''
+    result = models.CharField(choices=STATUS, max_length=50)
     test_case_run = models.ForeignKey(TestCaseRun, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f'{self.test_case_run}:{self.pk}'
 
 
 
 class TestSuite(models.Model):
+    '''Тестовый суит с тест кейсами'''
     name = models.CharField(max_length=200)
     description = models.TextField()
 
     test_cases = models.ManyToManyField(TestCase)
 
+    def __str__(self):
+        return f'{self.name}'
+
 
 
 class TestSuiteRun(models.Model):
-    name = models.CharField(max_length=200)
+    '''Модель с информацией по выполненному тест суиту'''
+    # name = models.CharField(max_length=200)
     status = models.CharField(choices=STATUS, max_length=50)
 
     test_suite = models.ForeignKey(TestSuite, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f'{self.test_suite}:{self.pk}::{self.status}'
+    

@@ -1,0 +1,7 @@
+{% extends 'main.html' %}
+
+{% block content %}
+    {% for project in object_list %}
+        <a href="{% url 'TMS:testcases' project %}">{{ project }}</a> <br>
+    {% endfor %}
+{% endblock %}

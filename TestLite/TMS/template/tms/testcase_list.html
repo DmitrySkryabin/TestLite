@@ -1,0 +1,26 @@
+{% extends 'main.html' %}
+
+{% block content %}
+    <h3>Проект: {{ project }}</h3>
+    <table>
+        <thead>
+            <td>Номер</td>
+            <td>Название</td>
+            <td>Версия</td>
+            <td>Приоритет</td>
+            <td>Статус</td>
+        </thead>
+        <tbody>
+            {% for testcase in object_list %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td><a href="{% url 'TMS:testcase_detail' project testcase.id %}">{{ testcase.name }}</a></td>
+                    <td>{{ testcase.version }}</td>
+                    <td>{{ testcase.priority }}</td>
+                    <td>{{ testcase.status }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+{% endblock %}

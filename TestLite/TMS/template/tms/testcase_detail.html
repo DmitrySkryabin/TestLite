@@ -1,0 +1,66 @@
+{% extends 'main.html' %}
+
+{% block content %}
+
+    <table style="width: 100%;">
+        <tr>
+            <td style="width: 70%;">
+                <table style="width: 100%;">
+                    <tr><td><h3>{{ object.name }}</h3></td></tr>
+                    <tr><td>{{ object.description }}</td></tr>
+                    <tr><td>
+                        <table style="width: 100%;" class="step">
+                            <tr><h4>Шаги теста</h4></tr>
+                            {% for teststep in testcase_steps %}
+                            <tr>
+                                <td>{{ teststep.action }}</td>
+                                <td>{{ teststep.expected_result }}</td>
+                            </tr>
+                            {% endfor %}
+                        </table>
+                    </td></tr>
+                </table>
+            </td>
+            <td style="width: 30%;">
+                <table style="width: 100%;">
+                    <tr><td><b>Версия: </b>{{ object.version }}</td></tr>
+                    <tr><td><b>Автор: </b>{{ object.author }}</td></tr>
+                    <tr><td><b>Создан: </b>created_on</td></tr>
+                    <tr><td><b>Обновлен: </b>updated_on</td></tr>
+                    <tr><td>---------------------------</td></tr>
+                    <tr><td><fieldset class="parametrs-conditions"><legend>Предусловия:</legend><p>{{ object.preconditions }}</p></fieldset></td></tr>
+                    <tr><td><fieldset class="parametrs-conditions"><legend>Постусловия:</legend><p>{{ object.postconditions }}</p></fieldset></td></tr>
+                    <tr><td><fieldset class="parametrs-conditions"><legend>Параметры:</legend><p>{{ object.parameters }}</p></fieldset></td></tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+
+
+    <!-- <table style="width: 100%;">
+        <tr>
+            <td></td>
+            <td style="width: 10%;">Version: {{ object.version }}</td>
+            <td style="width: 10%;">Author: {{ object.author }}</td>
+        </tr>
+        <tr>
+            <td colspan="3" ><b>Description:</b></td>
+        </tr>
+        <tr>
+            <td colspan="3">{{ object.description }}</td>
+        </tr>
+    </table>
+    
+    <h4>Preconditions:</h4>
+    <p>{{ object.preconditions }}</p>
+    <h4>Pastconditions:</h4>
+    <p>{{ object.pastconditions }}</p>
+    <p>Priority: {{ object.priority }}</p>
+    <h4>Parameters:</h4>
+    <p>{{ object.parameters }}</p>
+    lol1
+    {% for teststep in testcase_steps %}
+    lol
+        {{ teststep }}
+    {% endfor %} -->
+{% endblock %}
