@@ -13,8 +13,8 @@
                             <tr><h4>Шаги теста</h4></tr>
                             {% for teststep in testcase_steps %}
                             <tr>
-                                <td>{{ teststep.action }}</td>
-                                <td>{{ teststep.expected_result }}</td>
+                                <td style="width: 50%;">{{ teststep.action }}</td>
+                                <td style="width: 50%;">{{ teststep.expected_result }}</td>
                             </tr>
                             {% endfor %}
                         </table>

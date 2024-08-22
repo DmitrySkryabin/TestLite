@@ -69,13 +69,13 @@ html {
 }
 .con {
     padding: 5px;
-    display: flex;
-    flex-direction: column;
+}
+.con textarea {
+    border: none;
 }
 .teststep {
     display: flex;
 }
 .teststep textarea {
-    max-width: 90%;
-    min-height: 100px;
+    min-height: 60px;
 }

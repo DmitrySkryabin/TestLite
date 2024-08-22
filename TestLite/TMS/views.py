@@ -5,7 +5,7 @@ from django.shortcuts import render
 from django.views.generic import ListView, DetailView, UpdateView
 from django.forms import modelformset_factory
 from .models import Project, TestCase, TestStep
-from .forms import TestStepForm
+from .forms import TestStepForm, TestCaseForm
 
 # Create your views here.
 
@@ -40,14 +40,7 @@ class TestCaseDetailView(DetailView):
 
 class TestCaseUpdateView(UpdateView):
     model = TestCase
-    fields = [
-        'name',
-        'description',
-        'preconditions',
-        'postconditions',
-        'priority',
-        'parameters',
-    ]
+    form_class = TestCaseForm
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context =  super().get_context_data(**kwargs)
