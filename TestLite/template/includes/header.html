@@ -1,3 +1,10 @@
-<!-- <div class="header">
-
-</div> -->
+<div class="header">
+    <nav>
+        <ul>
+            {% if request.resolver_match.kwargs.project %}
+            <li><a href="{% url 'TMS:testcases' request.resolver_match.kwargs.project %}">Тест кейсы</a></li>
+            <li><a href="{% url 'TMS:testsuites' request.resolver_match.kwargs.project %}">Тест суиты</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+</div>

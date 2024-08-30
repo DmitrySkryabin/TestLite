@@ -1,18 +1,20 @@
 {% extends 'main.html' %}
 
 {% block content %}
-<form action="">
+<form action="" method="post">
     {% csrf_token %}
     <div class="form-con">
         <div class="left">
             {{ form.name }}
             {{ form.description }}
             <div class="teststeps">
+                {{ testcase_step_formset.management_form }}
                 {% for teststep in testcase_step_formset %}
                     <div class="teststep">
                         {{ teststep.action }}
                         {{ teststep.expected_result }}
-                        {{ teststep.position.as_hidden }}
+                        {{ teststep.position }}
+                        {{ teststep.id }}
                     </div>
                 {% endfor %}
             </div>
@@ -34,6 +36,7 @@
                 <legend>{{ form.parameters.label }}</legend>
                 {{ form.parameters }}
             </fieldset>
+            <button type="submit" class="green-btn btn" style="margin-top: 20px;">Сохранить</button>
         </div>
     </div>
 </form>

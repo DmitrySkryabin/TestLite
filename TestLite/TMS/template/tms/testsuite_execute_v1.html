@@ -1,0 +1,48 @@
+{% extends 'main.html' %}
+
+{% block content %}
+<form action="" method="post">
+    {% csrf_token %}
+    <div class="form-con">
+        <div class="left">
+                {% for testcase in testcases %}
+                <div class="teststeps execute-frame execute-frame-{{ testcase.pk }}">
+                    <h3>{{ testcase.name }}</h3>
+                    {{ teststep_formsets|dictitem:testcase.name|get_management_form }}
+                    {% for teststep in teststep_formsets|dictitem:testcase.name %}
+                        <div class="teststep">
+                            {{ teststep.action }}
+                            {{ teststep.expected_result }}
+                            {{ teststep.result }}
+                        </div>
+                    {% endfor %}
+                </div>
+                {% endfor %}
+        </div>
+        <div class="right">
+            {% for testcase in testcases %}
+            <div class="border" onclick="showExecuteFrame(this)" execute-frame="{{ testcase.pk }}">
+                {{ testcase }}
+            </div>
+            {% endfor %}
+            <button type="submit" class="green-btn btn">Сохранить</button>
+        </div>
+    </div>
+</form>
+
+<script>
+function showExecuteFrame(element) {
+    attrValue = element.getAttribute('execute-frame');
+    allFrames = document.getElementsByClassName('execute-frame');
+    for (i=0; i<allFrames.length; i++){
+        console.log('lol');
+        console.log(allFrames[i]);
+        allFrames[i].style.display = "none";
+    }
+    var unhideFrame = document.getElementsByClassName('execute-frame-' + attrValue);
+    unhideFrame[0].style.display = "block";
+  }
+</script>
+
+
+{% endblock %}

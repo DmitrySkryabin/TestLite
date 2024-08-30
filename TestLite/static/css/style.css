@@ -7,6 +7,9 @@ html {
     /* font-weight: <weight>;
     font-style: normal; */
 }
+.header {
+    background: #bdbdbd;
+}
  table, th, td {
     /* border: 1px solid black; */
     padding: 0;
@@ -22,13 +25,20 @@ html {
     padding: 0;
     margin: 10px 0 ;
 }
-.green-btn {
-    padding: 10px;
-    font-size: 20px;
-    color: white;
-    background: green;
+.btn {
+    margin-top: 20px;
     border-radius: 5px;
     width: 100%;
+    padding: 10px;
+    font-size: 20px;
+}
+.blue-btn {
+    color: white;
+    background: blue;
+}
+.green-btn {
+    color: white;
+    background: green;
 }
 .form-con {
     display: flex;
@@ -78,4 +88,36 @@ html {
 }
 .teststep textarea {
     min-height: 60px;
+}
+.border {
+    border: 1px solid black;
+}
+/* .teststeps {
+    margin-bottom: 10px;
+    background: red;
+} */
+.execute-frame {
+    display: none;
+}
+.execute-frame:first-child {
+    display: block;
+ }
+
+.status {
+    padding: 5px;
+    color: white;
+    border-radius: 5px;
+    font-size: 0.8em;
+}
+.P {
+    background: green;
+}
+.E {
+    background: rgb(107, 107, 31);
+}
+.F {
+    background: red;
+}
+.S {
+    background: grey;
 }

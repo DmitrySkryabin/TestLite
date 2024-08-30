@@ -1,0 +1,27 @@
+{% extends 'main.html' %}
+
+{% block content %}
+
+    <h3>{{ object.test_suite.name }} {{ object.date_time }}</h3>
+    <div class="form-con">
+        <div class="left">
+            {% for testcaserun in testcaseruns %}
+                <h4>{{ testcaserun.test_case.name }} <span class="status {{ testcaserun.status }}">{{testcaserun.get_status_display }}</span></h4>
+                <table>
+                    <tbody>
+                        {% for teststep in testcaserun.get_test_steps %}
+                        <tr>
+                            <td style="width: 45%; border: 1px solid black;">{{ teststep.action }}</td>
+                            <td style="width: 50%; border: 1px solid black;">{{ teststep.expected_result }}</td>
+                            <td style="width: 5%; border: 1px solid black;"><span class="status {{ teststep.result }}">{{ teststep.get_result_display }}</span></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% endfor %}
+        </div>
+        <div class="right">
+
+        </div>
+    </div>
+{% endblock %}

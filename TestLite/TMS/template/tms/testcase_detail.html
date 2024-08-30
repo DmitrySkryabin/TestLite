@@ -1,7 +1,6 @@
 {% extends 'main.html' %}
 
 {% block content %}
-
     <table style="width: 100%;">
         <tr>
             <td style="width: 70%;" valign="top">
@@ -25,14 +24,14 @@
                 <table style="width: 100%;">
                     <tr><td><b>Версия: </b>{{ object.version }}</td></tr>
                     <tr><td><b>Автор: </b>{{ object.author }}</td></tr>
-                    <tr><td><b>Создан: </b>created_on</td></tr>
-                    <tr><td><b>Обновлен: </b>updated_on</td></tr>
+                    <tr><td><b>Создан: </b>{{ object.created_on }}</td></tr>
+                    <tr><td><b>Обновлен: </b>{{ object.updated_on }}</td></tr>
                     <tr><td><b>Приоритет: </b>{{ object.priority }}</td></tr>
                     <tr><td>---------------------------</td></tr>
                     <tr><td><fieldset class="parametrs-conditions"><legend>Предусловия:</legend><p>{{ object.preconditions }}</p></fieldset></td></tr>
                     <tr><td><fieldset class="parametrs-conditions"><legend>Постусловия:</legend><p>{{ object.postconditions }}</p></fieldset></td></tr>
                     <tr><td><fieldset class="parametrs-conditions"><legend>Параметры:</legend><p>{{ object.parameters }}</p></fieldset></td></tr>
-                    <tr><td><a href="{% url 'TMS:testcase_update' request.resolver_match.kwargs.project object.id %}"><button class="green-btn">Редактировать</button></a></td></tr>
+                    <tr><td><a href="{% url 'TMS:testcase_update' request.resolver_match.kwargs.project object.id %}"><button class="green-btn btn">Редактировать</button></a></td></tr>
                 </table>
             </td>
         </tr>

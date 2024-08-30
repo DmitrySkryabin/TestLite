@@ -1,0 +1,138 @@
+{% extends 'main.html' %}
+
+{% block content %}
+    <div class="form-con">
+        <div class="left">
+                <form>
+                {% csrf_token %}
+                <input type="button" class="green-btn btn"  onclick="sendTestResult()" value="Отправить этот тест кейс">
+                <div class="testcase-inner teststeps">
+                    
+                </div>
+            </form>
+        </div>
+        <div class="right">
+            <input type="hidden" name="testsuiterun" value="{{ testsuiterun }}">
+            {% for testcase in testcases %}
+                <button onclick="asyncGetTestCase(this)" testcasepk="{{ testcase.pk }}">Async {{ testcase }}</button> <br>
+                <!-- <button onclick="getTestCase(this)">{{ testcase }} {{ testcase.pk }}</button> <br> -->
+            {% endfor %}
+        </div>
+    </div>
+
+<script>
+asyncGetTestCase(document.getElementsByTagName('button')[0])
+
+
+async function sendTestResult() {
+    const curUrl = window.location.href
+    const testCasePk = document.querySelector('input[name="testcasepk"]').getAttribute('value');
+    const csrftoken = document.querySelector('input[name="csrfmiddlewaretoken"]').getAttribute('value');
+    const testSuiteRunPk = document.querySelector('input[name="testsuiterun"]').getAttribute('value');
+    const form = document.getElementsByTagName('form')[0]
+
+    let url = ''
+    if ((curUrl.match('http:\/\/.*\/.*\/v2') == curUrl)) {
+        url = curUrl + '/' + testSuiteRunPk + '/testcase/' + testCasePk + '/save'
+    } else {
+        url = curUrl + '/testcase/' + testCasePk + '/save'
+    }
+    console.log(url)
+    const request = new Request(
+        url,
+        {
+            method: 'POST',
+            body: new FormData(form),
+            headers: {
+                'X-CSRFToken': csrftoken
+            }
+        }
+    )
+    try {
+        let response = await fetch(request);
+        let re = new RegExp('http:\/\/.*\/.*\/v2')
+        if (response.status == 200 && (curUrl.match('http:\/\/.*\/.*\/v2') == curUrl)) {
+            window.history.pushState({}, "", curUrl + '/' + testSuiteRunPk)
+        }
+    } catch (err) {
+        console.log(err);
+    }
+}
+
+function setTestCaseinner(testCaseHTML) {
+    let testCaseInner = document.getElementsByClassName('testcase-inner')[0];
+    testCaseInner.innerHTML = testCaseHTML;
+}
+
+async function asyncGetTestCase(element) {
+    const testCasePk = element.getAttribute('testcasepk');
+    const testSuiteRunPk = document.querySelector('input[name="testsuiterun"]').getAttribute('value');
+    const curUrl = window.location.href
+    let re = new RegExp('http:\/\/.*\/.*\/v2')
+    let url = ''
+    if ((curUrl.match('http:\/\/.*\/.*\/v2') == curUrl)) {
+        url = curUrl + '/' + testSuiteRunPk + '/testcase/' + testCasePk
+    } else {
+        url = curUrl + '/testcase/' + testCasePk
+    }
+    // console.log(curUrl)
+    // console.log('match ' + (curUrl.match('http:\/\/.*\/.*\/v2') == curUrl))
+    // console.log('test ' + re.test(curUrl))
+    console.log(url)
+    const request = new Request(
+        url,
+        {
+            method: 'GET'
+        }
+    )
+    try {
+        let response = await fetch(request);
+        let testCaseHTML = await response.text();
+        let parser = new DOMParser();
+        let testCaseDOM = parser.parseFromString(testCaseHTML, 'text/html');
+        let testSteps = testCaseDOM.getElementsByTagName('div');
+        let mainWrapper = document.createElement('div');
+        mainWrapper.innerHTML = '<h3>' + element.innerHTML.slice(6) + '</h3>';
+        mainWrapper.innerHTML = mainWrapper.innerHTML + '<input type="hidden" name="testcasepk" value="' + testCasePk + '"/>'
+        let managmentForm = testCaseDOM.getElementsByTagName('input');
+        for (i=0; i<4; i++) {
+            mainWrapper.innerHTML = mainWrapper.innerHTML + managmentForm[i].outerHTML
+        }
+        for (i=0; i<testSteps.length; i=i+3) {
+            testSteps[i].getElementsByTagName('label')[0].remove()
+            testSteps[i+1].getElementsByTagName('label')[0].remove()
+            testSteps[i+2].getElementsByTagName('label')[0].remove()
+            let innerWrapper = '<div class="teststep">' + testSteps[i].innerHTML + testSteps[i+1].innerHTML + testSteps[i+2].innerHTML + '</div>';
+            mainWrapper.innerHTML = mainWrapper.innerHTML + innerWrapper
+        }
+        setTestCaseinner(mainWrapper.innerHTML);
+    } catch (err) {
+        console.log(err);
+    }
+    
+}
+
+function getTestCase(element) {
+    const request = new Request(
+        'http://127.0.0.1:8000/CRM/testsuite/1/execute/v2/testcase/2',
+        {
+            method: 'GET'
+        }
+    )
+    fetch(request)
+    .then(function(response) {
+        // When the page is loaded convert it to text
+        return response.text()
+    })
+    .then(function(html) {
+        var parser = new DOMParser();
+        var doc = parser.parseFromString(html, "text/html", );
+        console.log(doc.body);
+    })
+    .catch(function(err) {  
+        console.log('Failed to fetch page: ', err);  
+    });
+}
+</script>
+
+{% endblock %}

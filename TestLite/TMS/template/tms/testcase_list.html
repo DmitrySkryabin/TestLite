@@ -17,7 +17,7 @@
                     <td><a href="{% url 'TMS:testcase_detail' project testcase.id %}">{{ testcase.name }}</a></td>
                     <td>{{ testcase.version }}</td>
                     <td>{{ testcase.priority }}</td>
-                    <td>{{ testcase.status }}</td>
+                    <td><span class="status {{ testcase.status }}">{{ testcase.get_status_display }}</span></td>
                 </tr>
             {% endfor %}
         </tbody>

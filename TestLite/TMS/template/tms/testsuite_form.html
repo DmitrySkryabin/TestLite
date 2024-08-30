@@ -1,0 +1,18 @@
+{% extends 'main.html' %}
+
+{% block content %}
+<form action="" method="post">
+    {% csrf_token %}
+    <div class="form-con">
+        <div class="left">
+            {{ form.name }}
+            {{ form.description }}
+            {{ form.test_cases }}
+            </table>
+        </div>
+        <div class="right">
+            <button type="submit" class="green-btn btn">Сохранить</button>
+        </div>
+    </div>
+</form>    
+{% endblock %}

@@ -1,0 +1,54 @@
+{% extends 'main.html' %}
+
+{% block content %}
+
+    <div class="form-con">
+        <div class="left">
+            <h3>{{ object.name }}</h3>
+            {{ object.description }}
+            <table>
+                <thead>
+                    <tr>
+                        <td>Номер</td>
+                        <td>Тесткейс</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for testcase in object.test_cases.all %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td><a href="{% url 'TMS:testcase_detail' request.resolver_match.kwargs.project testcase.id %}">{{ testcase.name }}</a></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <h4>Прогоны тест суита</h4>
+            <table>
+                <thead>
+                    <tr>
+                        <td>Номер</td>
+                        <td>Прогон</td>
+                        <td>Дата прогона</td>
+                        <td>Статус</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for testsuiterun in testsuiteruns %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td><a href="{% url 'TMS:testsuiterun_detail' request.resolver_match.kwargs.project object.id testsuiterun.pk %}">{{ testsuiterun }}</a></td>
+                            <td>{{ testsuiterun.date_time }}</td>
+                            <td><span class="status {{ testsuiterun.status }}">{{ testsuiterun.get_status_display }}</span></td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="right">
+            <a href="{% url 'TMS:testsuite_update' request.resolver_match.kwargs.project object.id %}"><button class="green-btn btn">Редактировать</button></a>
+            <a href="{% url 'TMS:testsuite_execute_v1' request.resolver_match.kwargs.project object.id %}"><button class="blue-btn btn">Выполнить V1</button></a>
+            <a href="{% url 'TMS:testsuite_execute_v2' request.resolver_match.kwargs.project object.id %}"><button class="blue-btn btn">Выполнить V2</button></a>
+        </div>
+    </div>
+</form>
+{% endblock %}
