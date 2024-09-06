@@ -41,6 +41,7 @@ class TestCaseDetailView(DetailView):
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
         context['testcase_steps'] = TestStep.objects.filter(test_case=self.object)
+        context['testcaseruns'] = TestCaseRun.objects.filter(test_case=self.object)
         return context
 
 
@@ -122,6 +123,7 @@ class TestSuiteExecuteV1(TemplateView):
             if not created:
                 testsuiterun = TestSuiteRun()
                 testsuiterun.test_suite = TestSuite.objects.get(pk=kwargs.get('pk'))
+                testsuiterun.type = TYPE.MANUAL
                 created = True
             teststep_formsets = teststep_formset(request.POST, prefix=f'teststep_formset_{testcase.pk}')
             if teststep_formsets.is_valid():
@@ -200,6 +202,7 @@ class TestSuiteExecuteV2(TemplateView):
             testsuiterun = TestSuiteRun.objects.filter(pk=kwargs.get('testsuiterun_pk')).first()
             if testsuiterun is None:
                 testsuiterun = TestSuiteRun()
+                testsuiterun.type = TYPE.MANUAL
                 testsuiterun.test_suite = TestSuite.objects.get(pk=kwargs.get('pk'))
 
             '''Создаем новый ТестКейсРан'''

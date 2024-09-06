@@ -114,6 +114,7 @@ class TestSuite(models.Model):
 class TestSuiteRun(models.Model):
     '''Модель с информацией по выполненному тест суиту'''
     # name = models.CharField(max_length=200)
+    type = models.CharField(choices=TYPE, max_length=20)
     status = models.CharField(choices=STATUS, max_length=50)
     date_time = models.DateTimeField(auto_now=True)
 
@@ -128,8 +129,8 @@ class TestCaseRun(models.Model):
     # name = models.CharField(max_length=200)
     start_time = models.DateTimeField()
     duration = models.FloatField()
-    type = models.TextField(choices=TYPE, max_length=20) # Тип запуска 
-    status = models.TextField(choices=STATUS, max_length=50)
+    type = models.CharField(choices=TYPE, max_length=20) # Тип запуска 
+    status = models.CharField(choices=STATUS, max_length=50)
 
     test_case = models.ForeignKey(TestCase, on_delete=models.CASCADE)
     test_suite_run = models.ForeignKey(TestSuiteRun, on_delete=models.CASCADE)

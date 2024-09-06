@@ -29,6 +29,7 @@
                         <td>Номер</td>
                         <td>Прогон</td>
                         <td>Дата прогона</td>
+                        <td>Тип</td>
                         <td>Статус</td>
                     </tr>
                 </thead>
@@ -38,6 +39,7 @@
                             <td>{{ forloop.counter }}</td>
                             <td><a href="{% url 'TMS:testsuiterun_detail' request.resolver_match.kwargs.project object.id testsuiterun.pk %}">{{ testsuiterun }}</a></td>
                             <td>{{ testsuiterun.date_time }}</td>
+                            <td><span class="status {{ testsuiterun.type }}">{{ testsuiterun.get_type_display }}</span></td>
                             <td><span class="status {{ testsuiterun.status }}">{{ testsuiterun.get_status_display }}</span></td>
                         </tr>
                     {% endfor %}

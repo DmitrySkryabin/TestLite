@@ -1,67 +1,61 @@
+
 {% extends 'main.html' %}
 
 {% block content %}
-    <table style="width: 100%;">
-        <tr>
-            <td style="width: 70%;" valign="top">
-                <table style="width: 100%;">
-                    <tr><td><h3>{{ object.name }}</h3></td></tr>
-                    <tr><td>{{ object.description }}</td></tr>
-                    <tr><td>
-                        <table style="width: 100%;" class="step">
-                            <tr><h4>Шаги теста</h4></tr>
-                            {% for teststep in testcase_steps %}
-                            <tr>
-                                <td style="width: 50%;">{{ teststep.action }}</td>
-                                <td style="width: 50%;">{{ teststep.expected_result }}</td>
-                            </tr>
-                            {% endfor %}
-                        </table>
-                    </td></tr>
-                </table>
-            </td>
-            <td style="width: 30%;" valign="top">
-                <table style="width: 100%;">
-                    <tr><td><b>Версия: </b>{{ object.version }}</td></tr>
-                    <tr><td><b>Автор: </b>{{ object.author }}</td></tr>
-                    <tr><td><b>Создан: </b>{{ object.created_on }}</td></tr>
-                    <tr><td><b>Обновлен: </b>{{ object.updated_on }}</td></tr>
-                    <tr><td><b>Приоритет: </b>{{ object.priority }}</td></tr>
-                    <tr><td>---------------------------</td></tr>
-                    <tr><td><fieldset class="parametrs-conditions"><legend>Предусловия:</legend><p>{{ object.preconditions }}</p></fieldset></td></tr>
-                    <tr><td><fieldset class="parametrs-conditions"><legend>Постусловия:</legend><p>{{ object.postconditions }}</p></fieldset></td></tr>
-                    <tr><td><fieldset class="parametrs-conditions"><legend>Параметры:</legend><p>{{ object.parameters }}</p></fieldset></td></tr>
-                    <tr><td><a href="{% url 'TMS:testcase_update' request.resolver_match.kwargs.project object.id %}"><button class="green-btn btn">Редактировать</button></a></td></tr>
-                </table>
-            </td>
-        </tr>
-    </table>
-
-
-    <!-- <table style="width: 100%;">
-        <tr>
-            <td></td>
-            <td style="width: 10%;">Version: {{ object.version }}</td>
-            <td style="width: 10%;">Author: {{ object.author }}</td>
-        </tr>
-        <tr>
-            <td colspan="3" ><b>Description:</b></td>
-        </tr>
-        <tr>
-            <td colspan="3">{{ object.description }}</td>
-        </tr>
-    </table>
-    
-    <h4>Preconditions:</h4>
-    <p>{{ object.preconditions }}</p>
-    <h4>Pastconditions:</h4>
-    <p>{{ object.pastconditions }}</p>
-    <p>Priority: {{ object.priority }}</p>
-    <h4>Parameters:</h4>
-    <p>{{ object.parameters }}</p>
-    lol1
-    {% for teststep in testcase_steps %}
-    lol
-        {{ teststep }}
-    {% endfor %} -->
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-8">
+            <h3>{{ object.name }}</h3>
+            <p>{{ object.description }}</p>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th colspan="2"><h4>Шаги теста</h4></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for teststep in testcase_steps %}
+                    <tr>
+                        <td>{{ teststep.action }}</td>
+                        <td>{{ teststep.expected_result }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th colspan="5"><h4>Прогоны тестов</h4></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for testcaserun in testcaseruns %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ testcaserun }}</td>
+                        <td>{{ testcaserun.start_time }}</td>
+                        <td><span class="badge badge-{{ testcaserun.type }}">{{ testcaserun.get_type_display }}</span></td>
+                        <td><span class="badge badge-{{ testcaserun.status }}">{{ testcaserun.get_status_display }}</span></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="col-md-4">
+            <table class="table">
+                <tr><td><b>Версия: </b>{{ object.version }}</td></tr>
+                <tr><td><b>Автор: </b>{{ object.author }}</td></tr>
+                <tr><td><b>Создан: </b>{{ object.created_on }}</td></tr>
+                <tr><td><b>Обновлен: </b>{{ object.updated_on }}</td></tr>
+                <tr><td><b>Приоритет: </b>{{ object.priority }}</td></tr>
+                <tr><td>---------------------------</td></tr>
+                <tr><td><fieldset class="border p-2"><legend class="w-auto">Предусловия:</legend><p>{{ object.preconditions }}</p></fieldset></td></tr>
+                <tr><td><fieldset class="border p-2"><legend class="w-auto">Постусловия:</legend><p>{{ object.postconditions }}</p></fieldset></td></tr>
+                <tr><td><fieldset class="border p-2"><legend class="w-auto">Параметры:</legend><p>{{ object.parameters }}</p></fieldset></td></tr>
+                <tr><td><a href="{% url 'TMS:testcase_update' request.resolver_match.kwargs.project object.id %}" class="btn btn-success">Редактировать</a></td></tr>
+            </table>
+        </div>
+    </div>
+</div>
 {% endblock %}
+
