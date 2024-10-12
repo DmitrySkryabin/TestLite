@@ -1,26 +1,74 @@
 {% extends 'main.html' %}
 
 {% block content %}
-    <h3>Проект: {{ project }}</h3>
-    <table>
-        <thead>
-            <td>Номер</td>
-            <td>Название</td>
-            <td>Версия</td>
-            <td>Приоритет</td>
-            <td>Статус</td>
-        </thead>
-        <tbody>
-            {% for testcase in object_list %}
-                <tr>
-                    <td>{{ forloop.counter }}</td>
-                    <td><a href="{% url 'TMS:testcase_detail' project testcase.id %}">{{ testcase.name }}</a></td>
-                    <td>{{ testcase.version }}</td>
-                    <td>{{ testcase.priority }}</td>
-                    <td><span class="status {{ testcase.status }}">{{ testcase.get_status_display }}</span></td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    
+
+<div class="container-fluid h-100">
+    <div class="row h-100">
+        <div class="col-md-2 h-100 border-end">
+            <div class="row h-6dot4">
+                <div class="container d-flex justify-content-between align-items-center">
+                    <h3>{{ project.key }}</h3>
+                    <button class="btn btn-warning btn-sm">Добавить группу</button>
+                </div>
+            </div>
+            <div class="row h-93dot6">
+                <div class="container">
+                    <ul class="list-group">
+                        <li class="list-group-item d-flex justify-content-between align-items-start table-row-clickable" onclick="goToFromTable(this)" href="{% url 'TMS:testcases' project.key %}">
+                            <div class="ms-2 me-auto">
+                            <span class="fw-bold">Все</span>
+                            </div>
+                            <span class="badge bg-warning rounded-pill">{{ object_list.count }}</span>
+                        </li>
+                        {% for folder in testcase_folders %}
+                            <li class="list-group-item d-flex justify-content-between align-items-start table-row-clickable" onclick="goToFromTable(this)" href="{{ request.path }}?folder={{ folder.pk }}">
+                                <div class="ms-2 me-auto">
+                                {{ folder }}
+                                </div>
+                                <span class="badge bg-warning rounded-pill">{{ folder.test_cases.all.count }}</span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-10 h-100">
+            <div class="row h-6dot4">
+                <div class="container d-flex align-items-center">
+                    <a href="{% url 'TMS:testcase_create' project.key %}"class="btn btn-warning btn-sm col-auto">Добавить тест кейс</a>
+                </div>
+            </div>
+            <div class="row h-93dot6">
+                <div class="container">
+                    <div class="table-container border rounded-top h-100">
+                        <table class="table table-sm table-responsive">
+                            <thead class="table-light">
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">Ключ</th>
+                                    <th scope="col">Название</th>
+                                    <th scope="col">Версия</th>
+                                    <th scope="col">Приоритет</th>
+                                    <th scope="col">Статус</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for testcase in object_list %}
+                                <tr onclick="goToFromTable(this)" class="table-row-clickable" href="{% url 'TMS:testcase_detail' project.key testcase.id %}">
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>{{ testcase.key }}</td>
+                                    <td>{{ testcase.name }}</td>
+                                    <td>{{ testcase.version }}</td>
+                                    <td><span class="badge {{ testcase.priority|priority_bootstrap_class }}">{{ testcase.get_priority_display }}</span></td>
+                                    <td>{% if testcase.status %}<span class="badge {{ testcase.status|status_bootstrap_class }}">{{ testcase.get_status_display }}</span>{% endif %}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

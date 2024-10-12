@@ -1,3 +1,5 @@
+import json
+import datetime
 from typing import Any
 from django.db.models.base import Model as Model
 from django.db.models.query import QuerySet
@@ -5,11 +7,13 @@ from django.http import HttpResponse, JsonResponse
 from django.utils import timezone
 from django.shortcuts import redirect
 from django.urls import reverse
-from django.views.generic import ListView, DetailView, UpdateView, TemplateView
+from django.views.decorators.csrf import csrf_exempt
+from django.views.generic import ListView, DetailView, UpdateView, TemplateView, View, CreateView
 from django.forms import BaseModelForm, modelformset_factory
-from .models import Project, TestCase, TestStep, TestSuite, TestSuiteRun, TestStepRun, TestCaseRun
+from .models import Project, TestCase, TestStep, TestSuite, TestSuiteRun, TestStepRun, TestCaseRun, TestCaseFolder
 from .models import STATUS, PRIORITY, TYPE
-from .forms import TestStepForm, TestCaseForm, TestSuiteForm, TestStepRunForm, TestStepRunFormset
+from .forms import TestStepForm, TestCaseForm, TestSuiteForm, TestStepRunForm, TestStepRunFormset, TestCaseFormset
+from .service import TestSuiteSaveHelper
 
 # Create your views here.
 
@@ -21,13 +25,21 @@ class ProjectListView(ListView):
 class TestCaseListView(ListView):
 
     def get_queryset(self) -> QuerySet[Any]:
-        return TestCase.objects.filter(project__name=self.kwargs.get('project'))
+        folder = self.request.GET.get('folder')
+        if folder is not None:
+            return TestCase.objects.filter(project__key=self.kwargs.get('project'), testcasefolder__id=folder)
+        else:
+            return TestCase.objects.filter(project__key=self.kwargs.get('project'))
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
-        context['project'] = self.kwargs.get('project')
+        context['project'] = Project.objects.get(key=self.kwargs.get('project'))
         for obj in context['object_list']:
-            obj.status = TestCaseRun.objects.filter(test_case=obj).last().status
+            if TestCaseRun.objects.filter(test_case=obj).last() is not None:
+                obj.status = TestCaseRun.objects.filter(test_case=obj).last().status
+            else:
+                obj.status = None
+        context['testcase_folders'] = TestCaseFolder.objects.filter(project=context['project'])
         return context
     
 
@@ -40,8 +52,9 @@ class TestCaseDetailView(DetailView):
     
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
+        context['testcase_parameters_as_text'] = json.dumps(self.object.parameters)
         context['testcase_steps'] = TestStep.objects.filter(test_case=self.object)
-        context['testcaseruns'] = TestCaseRun.objects.filter(test_case=self.object)
+        context['testcaseruns'] = TestCaseRun.objects.filter(test_case=self.object).order_by('-stop_time')
         return context
 
 
@@ -52,11 +65,12 @@ class TestCaseUpdateView(UpdateView):
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context =  super().get_context_data(**kwargs)
-        testcase_step_formset = modelformset_factory(form=TestStepForm, model=TestStep)
+        testcase_step_formset = modelformset_factory(form=TestStepForm, model=TestStep, formset=TestCaseFormset, extra=0, can_delete=True)
         if self.request.POST:
             context['testcase_step_formset'] = testcase_step_formset(self.request.POST)
         else:
             context['testcase_step_formset'] = testcase_step_formset(queryset=TestStep.objects.filter(test_case=self.object))
+        context['testcase'] = self.get_object
         
         return context
     
@@ -68,7 +82,45 @@ class TestCaseUpdateView(UpdateView):
             for teststep in context['testcase_step_formset'].save(commit=False):
                 teststep.test_case = testcase
                 teststep.save()
-        return redirect(reverse('TMS:testcase_detail', kwargs={'project': f'{self.object.project}', 'pk': self.object.pk}))
+        else:
+            print(context['testcase_step_formset'].errors)
+
+        return redirect(reverse('TMS:testcase_detail', kwargs={'project': f'{self.object.project.key}', 'pk': self.object.pk}))
+    
+
+
+class TestCaseCreateView(CreateView):
+    model = TestCase
+    form_class = TestCaseForm
+    
+
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        context =  super().get_context_data(**kwargs)
+        testcase_step_formset = modelformset_factory(form=TestStepForm, model=TestStep, extra=0)
+        if self.request.POST:
+            context['testcase_step_formset'] = testcase_step_formset(self.request.POST)
+        else:
+            context['testcase_step_formset'] = testcase_step_formset(queryset=TestStep.objects.none())
+        context['testcase'] = self.get_object
+        
+        return context
+    
+
+    def form_valid(self, form: BaseModelForm) -> HttpResponse:
+        context = self.get_context_data()
+        if context['testcase_step_formset'].is_valid():
+            testcase = form.save(commit=False)
+            testcase.version = 1
+            testcase.author = self.request.user
+            testcase.project = Project.objects.get(key=self.kwargs.get('project'))
+            testcase.save()
+            for teststep in context['testcase_step_formset'].save(commit=False):
+                teststep.test_case = testcase
+                teststep.save()
+        else:
+            print(context['testcase_step_formset'].errors)
+
+        return redirect(reverse('TMS:testcase_detail', kwargs={'project': f'{testcase.project.key}', 'pk': testcase.pk}))
     
 
 
@@ -93,7 +145,7 @@ class TestSuiteUpdateView(UpdateView):
 
     def form_valid(self, form: BaseModelForm) -> HttpResponse:
         testsuite = form.save()
-        return redirect(reverse('TMS:testsuite_detail', kwargs={'project':f'{testsuite.test_cases.first().project}', 'pk': testsuite.pk}))
+        return redirect(reverse('TMS:testsuite_detail', kwargs={'project':f'{testsuite.test_cases.first().project.key}', 'pk': testsuite.pk}))
     
 
 
@@ -136,6 +188,7 @@ class TestSuiteExecuteV1(TemplateView):
                         expected_result = value
                 testcaserun = TestCaseRun()
                 testcaserun.start_time = timezone.now()
+                testcaserun.stop_time = timezone.now()
                 testcaserun.duration = 99999
                 testcaserun.type = TYPE.MANUAL
                 testcaserun.test_suite_run = testsuiterun
@@ -208,6 +261,7 @@ class TestSuiteExecuteV2(TemplateView):
             '''Создаем новый ТестКейсРан'''
             testcaserun = TestCaseRun()
             testcaserun.start_time = timezone.now()
+            testcaserun.stop_time = timezone.now()
             testcaserun.duration = 99999
             testcaserun.type = TYPE.MANUAL
             testcaserun.test_suite_run = testsuiterun
@@ -235,6 +289,54 @@ class TestSuiteExecuteV2(TemplateView):
         return HttpResponse('SUCCESS')
     
 
+class TestSuiteExecuteV3(TemplateView):
+    template_name = 'TMS/testsuite_execute_v3.html'
+
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        testsuite_pk = kwargs.get('pk')
+        context = super().get_context_data(**kwargs)
+        testsuite = TestSuite.objects.get(pk=testsuite_pk)
+        testcases = testsuite.test_cases.all()
+        context['testcases'] = testcases
+
+        return context
+    
+
+    def post(self, request, *args, **kwargs):
+        print(kwargs)
+        data = []
+        for testcase, steps in dict(request.POST).items():
+            if testcase != 'csrfmiddlewaretoken':
+                step_number_with_error = None
+                status = 'skip'
+                for i, step in enumerate(steps, start=1):
+                    if step != 'S':
+                        if step == 'P' and status != 'fail' and status != 'error':
+                            status = 'passed'
+                        if step == 'F' and status != 'error':
+                            status = 'fail'
+                            step_number_with_error = i
+                        if step == 'E':
+                            status = 'error'
+                            step_number_with_error = i  
+                data.append({
+                    'testcase_key': f'{testcase}',
+                    'status': status,
+                    'duration': 9999,
+                    'report': None, #ok
+                    'log': '',
+                    'skipreason': None, #ok
+                    'precondition_status': 'passed',
+                    'postcondition_status': 'passed',
+                    'step_number_with_error': step_number_with_error,
+                    'startime_readable': f'{datetime.datetime.now()}',
+                    'stoptime_readable': f'{datetime.datetime.now()}'
+                })
+        TestSuiteSaveHelper.save_test_suite_run(TestSuite.objects.get(pk=kwargs.get('pk')).key, data, type=TYPE.MANUAL)
+        
+        return redirect(reverse('TMS:testsuite_detail', kwargs={'project': kwargs.get('project'), 'pk': kwargs.get('pk')}))
+    
+
 
 class TestSuiteRunDetailView(DetailView):
     model = TestSuiteRun
@@ -243,3 +345,19 @@ class TestSuiteRunDetailView(DetailView):
         context = super().get_context_data(**kwargs)
         context['testcaseruns'] = TestCaseRun.objects.filter(test_suite_run=self.object)
         return context
+    
+
+class API:
+
+    pass
+
+
+class APIv1(API):
+
+    @csrf_exempt
+    def save_testsuite(request, *args, **kwargs):
+        testsuite_key = kwargs.get('testsuite')
+        data = json.loads(request.body)
+        TestSuiteSaveHelper.save_test_suite_run(testsuite_key, data)
+
+        return HttpResponse('LOL')

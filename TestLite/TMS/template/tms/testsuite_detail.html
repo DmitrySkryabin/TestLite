@@ -50,6 +50,7 @@
             <a href="{% url 'TMS:testsuite_update' request.resolver_match.kwargs.project object.id %}"><button class="green-btn btn">Редактировать</button></a>
             <a href="{% url 'TMS:testsuite_execute_v1' request.resolver_match.kwargs.project object.id %}"><button class="blue-btn btn">Выполнить V1</button></a>
             <a href="{% url 'TMS:testsuite_execute_v2' request.resolver_match.kwargs.project object.id %}"><button class="blue-btn btn">Выполнить V2</button></a>
+            <a href="{% url 'TMS:testsuite_execute_v3' request.resolver_match.kwargs.project object.id %}"><button class="blue-btn btn">Выполнить V3</button></a>
         </div>
     </div>
 </form>

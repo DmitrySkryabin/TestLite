@@ -1,129 +1,94 @@
-html {
-    font-size: 20px;
-    padding: 0;
-    margin: 0;
-    font-family: "Rubik", sans-serif;
-    font-optical-sizing: auto;
-    /* font-weight: <weight>;
-    font-style: normal; */
-}
-.header {
-    background: #bdbdbd;
-}
- table, th, td {
-    /* border: 1px solid black; */
-    padding: 0;
-    margin: 0;
- }
-
-.step td{
-    padding: 10px;
-    border: 1px solid black; 
-}
-
-.parametrs-conditions p{
-    padding: 0;
-    margin: 10px 0 ;
-}
-.btn {
-    margin-top: 20px;
-    border-radius: 5px;
-    width: 100%;
-    padding: 10px;
-    font-size: 20px;
-}
-.blue-btn {
-    color: white;
-    background: blue;
-}
-.green-btn {
-    color: white;
-    background: green;
-}
-.form-con {
-    display: flex;
+body{
     height: 100vh;
-}  
-.form-con textarea {
-    width: 100%;
-    font-size: 20px;
-    resize: vertical;
-    font-family: "Rubik", sans-serif;
-    font-optical-sizing: auto;
-} 
-.form-con select {
-    font-size: 20px;
-    font-family: "Rubik", sans-serif;
-    font-optical-sizing: auto;
 }
-.form-con input {
-    font-size: 24px;
-    font-family: "Rubik", sans-serif;
-    font-optical-sizing: auto;
+
+:root{
+    --header-height: 6.4%;
+}
+
+.h-6dot4{
+    height: var(--header-height);
+}
+.h-93dot6{
+    height: calc(100% - var(--header-height));
+}
+
+.accordion-item{
+    padding: 0px !important;
+    margin: 0px !important;
+    border: none !important;
+}
+
+.not-padd{
+    padding: 0 !important;
+}
+
+.hide{
+    display: none !important;
+}
+
+.table-row-clickable:hover{
+    background: #fff3cd !important;
+    cursor: pointer;
+}
+.table tbody tr:hover td, .table tbody tr:hover th {
+    background-color: #fff3cd;
+}
+
+.nav-pills .active{
+    background: var(--bs-warning) !important;
+    color: black !important;
+}
+.nav-pills .nav-link{
+    color: black !important;
+}
+.nav-pills .nav-link:not(.active):hover{
+    background: #fff3cd !important;
+}
+
+.collapse-link{
     font-weight: bold;
+    text-transform: uppercase;
 }
-.left input {
-    margin-top: 20px;
+.collapse-link.collapsed::before {
+    content: "\F285";
+    font-family: "Bootstrap-icons";
 }
-.left textarea {
-    margin-top: 20px;
+.collapse-link:not(.collapsed)::before {
+    content: "\F282";
+    font-family: "Bootstrap-icons";
 }
-.left {
-    width: 70%;
-    padding: 5px;
+
+.col-teststep-counter{
+    width: 50px;
+    text-align: center;
 }
-.right {
-    width: 30%;
-    height: 100%;
-    padding: 5px;
+
+.teststep{
+    position: relative;
 }
-.con {
-    padding: 5px;
+.teststep:hover .dropdown{
+    display: block;
 }
-.con textarea {
-    border: none;
-}
-.teststep {
-    display: flex;
-}
-.teststep textarea {
-    min-height: 60px;
-}
-.border {
-    border: 1px solid black;
-}
-/* .teststeps {
-    margin-bottom: 10px;
-    background: red;
-} */
-.execute-frame {
+.teststep .dropdown{
+    position: absolute;
+    right: 0;
+    margin: 5px 5px 0 0;
+    z-index: 1;
     display: none;
 }
-.execute-frame:first-child {
-    display: block;
- }
 
-.status {
-    padding: 5px;
-    color: white;
-    border-radius: 5px;
-    font-size: 0.8em;
+.testcase-form input{
+    font-weight: 500;
 }
-.P {
-    background: green;
+
+.parameters-container{
+    position: relative;
 }
-.E {
-    background: rgb(107, 107, 31);
-}
-.F {
-    background: red;
-}
-.S {
-    background: grey;
-}
-.M {
-    background: rgb(89, 89, 163);
-}
-.A {
-    background: rgb(16, 16, 77);
+
+.beautify-button{
+    position: absolute;
+    right: 0;
+    top: 0;
+    margin: 5px 5px;
 }

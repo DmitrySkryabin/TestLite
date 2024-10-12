@@ -1,43 +1,239 @@
 {% extends 'main.html' %}
 
 {% block content %}
-<form action="" method="post">
+<form action="" method="post" class="h-100 testcase-form">
     {% csrf_token %}
-    <div class="form-con">
-        <div class="left">
-            {{ form.name }}
-            {{ form.description }}
-            <div class="teststeps">
-                {{ testcase_step_formset.management_form }}
-                {% for teststep in testcase_step_formset %}
-                    <div class="teststep">
-                        {{ teststep.action }}
-                        {{ teststep.expected_result }}
-                        {{ teststep.position }}
-                        {{ teststep.id }}
+    <div class="container-fluid h-100">
+        <div class="row h-100">
+            <div class="col-auto pt-2 border-end">
+                <a href="{% url 'TMS:testcases' request.resolver_match.kwargs.project %}" class="btn btn-warning">
+                    <i class="bi bi-arrow-left"></i></a>
+            </div>
+            <div class="col h-100">
+                <div class="row h-6dot4 border-bottom">
+                    <div class="container pb-2 pt-2">
+                        <div class="row">
+                            <div class="col-1 d-flex align-items-center">
+                                <h5>{{ object.key }}</h5>
+                            </div>
+                            <div class="col-9 d-flex align-items-center">
+                                {{ form.name }}
+                            </div>
+                            <div class="col-md-2 d-flex justify-content-between align-items-center">
+                                <button type="submit" class="btn btn-warning">Сохранить</button>
+                            </div>
+                        </div>
                     </div>
-                {% endfor %}
+                </div>
+                <div class="row h-93dot6">
+                    <div class="col-md-1 border-end pb-2 pt-2">
+                        <div class="nav flex-column nav-pills me-3" id="v-pills-tab" role="tablist"
+                            aria-orientation="vertical">
+                            <button class="nav-link active d-flex mb-1" id="teststeps-tab" data-bs-toggle="pill"
+                                data-bs-target="#teststeps" type="button" role="tab" aria-controls="teststeps"
+                                aria-selected="true">Шаги теста</button>
+                            <button class="nav-link d-flex mb-1" id="parameters-tab" data-bs-toggle="pill"
+                                data-bs-target="#parameters" type="button" role="tab" aria-controls="parameters"
+                                aria-selected="false">Параметры</button>
+                            <button class="nav-link d-flex mb-1" id="description-tab" data-bs-toggle="pill"
+                                data-bs-target="#description" type="button" role="tab" aria-controls="description"
+                                aria-selected="false">Описание</button>
+                        </div>
+                    </div>
+                    <div class="col-md-8 border-end pb-2 not-padd h-100 overflow-auto">
+                        <div class="tab-content pt-2 h-100" id="v-pills-tabContent">
+                            <div class="tab-pane fade show active" id="teststeps" role="tabpanel"
+                                aria-labelledby="teststeps">
+                                <div class="container testcase-collapse-content">
+                                    <div class="row">
+                                        <p class="collapse-link collapsed" data-bs-toggle="collapse" href="#CollapsePrecondition" role="button"
+                                            aria-expanded="false" aria-controls="CollapsePrecondition">
+                                            Предусловия</p>
+                                        <div class="collapse mb-2" id="CollapsePrecondition">
+                                            {{ form.preconditions }}
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <p class="collapse-link" data-bs-toggle="collapse" href="#CollapseSteps" role="button"
+                                            aria-expanded="true" aria-controls="CollapseSteps">
+                                            Шаги</p>
+                                        <div class="collapse show mb-2" id="CollapseSteps">
+                                            <ul class="list-group list-group-horizontal mb-1 draggable teststep hide" draggable="true" id="forCopy">
+                                                <li class="list-group-item bg-secondary text-light col-teststep-counter"></li>
+                                                <textarea name="" cols="1" rows="1" onkeyup="textAreaAdjust(this)" class=" list-group-item col" id=""></textarea>
+                                                <input type="hidden" name="" value="0" id="">
+                                                <input type="hidden" name="" value="" id="">
+                                                <textarea name="" cols="1" rows="1" onkeyup="textAreaAdjust(this)" class=" list-group-item col" id=""></textarea>
+                                            </ul>
+                                            {{ testcase_step_formset.management_form }}
+                                            <div class="list-group" id="stepsList">
+                                                {% for teststep in testcase_step_formset %}
+                                                    <ul class="list-group list-group-horizontal mb-1 draggable teststep" draggable="true">
+                                                        <li class="list-group-item bg-secondary text-light col-teststep-counter">{{ forloop.counter }}</li>
+                                                        {{ teststep.action }}
+                                                        {{ teststep.position.as_hidden }}
+                                                        {{ teststep.id }}
+                                                        {{ teststep.DELETE }}
+                                                        <div class="dropdown">
+                                                            <a class="btn btn-secondary btn-sm" href="#" role="button" id="testStepActions{{ forloop.counter0 }}" data-bs-toggle="dropdown" aria-expanded="false">
+                                                                <i class="bi bi-three-dots"></i>
+                                                            </a>
+                                                            <ul class="dropdown-menu" aria-labelledby="testStepActions{{ forloop.counter0 }}">
+                                                              <li><a class="dropdown-item text-danger" href="#" onclick="markForDeleting(this)" teststep-id="{{ forloop.counter0 }}">Удалить</a></li>
+                                                            </ul>
+                                                          </div>
+                                                        {{ teststep.expected_result }}
+                                                    </ul>
+                                                {% endfor %}
+                                            </div>
+                                            <button class="btn btn-warning" type="button" onclick="addTestStep()">Добавить шаг</button>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <p class="collapse-link collapsed" data-bs-toggle="collapse" href="#CollapsePostcondition" role="button"
+                                            aria-expanded="false" aria-controls="CollapsePostcondition">
+                                            Постусловия</p>
+                                        <div class="collapse mb-2" id="CollapsePostcondition">
+                                            {{ form.postconditions }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="tab-pane fade h-100" id="parameters" role="tabpanel" aria-labelledby="parameters">
+                                <div class="container h-100">
+                                    <div class="h-100 parameters-container">
+                                        <button type="button" class="btn btn-warning beautify-button" onclick="testCaseParametersBeautify()">{}</button>
+                                    {{ form.parameters }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="tab-pane fade h-100" id="description" role="tabpanel" aria-labelledby="description">
+                                <div class="container h-100">
+                                    {{ form.description }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 pb-2 pt-2 h-100 overflow-auto">
+                        <div class="container">
+                            <div class="row mb-2">
+                                <label for="testCasePriority" class="col-4 col-form-label">Приоритет</label>
+                                <div class="col">
+                                    {{ form.priority }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
-        <div class="right">
-            <div>
-                {{ form.priority.label }}
-                {{ form.priority }}
-            </div>
-            <fieldset class="con">
-                <legend>{{ form.preconditions.label }}</legend>
-                {{ form.preconditions }}
-            </fieldset>
-            <fieldset class="con">
-                <legend>{{ form.postconditions.label }}</legend>
-                {{ form.postconditions }}
-            </fieldset>
-            <fieldset class="con">
-                <legend>{{ form.parameters.label }}</legend>
-                {{ form.parameters }}
-            </fieldset>
-            <button type="submit" class="green-btn btn" style="margin-top: 20px;">Сохранить</button>
         </div>
     </div>
 </form>
+
+<script>
+
+    document.addEventListener('DOMContentLoaded', function(){
+        testCaseParametersBeautify();
+    });
+    
+    function testCaseParametersBeautify(){
+        console.log('Beautify');
+        const parametersTextArea = document.getElementById("testCaseParameters");
+        const json = JSON.parse(parametersTextArea.value);
+        console.log(json);
+        parametersTextArea.value = JSON.stringify(json, undefined, 2)
+    }
+
+    function markForDeleting(elem){
+        const testStepId = elem.getAttribute('teststep-id');
+        console.log(testStepId);
+        const deleteInput = document.querySelector('input[name$=' + 'form-' + testStepId + '-DELETE');
+        console.log(deleteInput);
+        deleteInput.checked = true;
+    }
+    
+
+    const totalForm = document.getElementById('id_form-TOTAL_FORMS')
+    const stepList = document.getElementById('stepsList');
+    const step = document.querySelector('#forCopy');
+    step.classList.add('hide');
+
+    function resetPositionNumbers(){
+        const positionsArray = stepList.querySelectorAll('input[name$=position]');
+        const counterArray = stepList.querySelectorAll('li[class$=col-teststep-counter]')
+        console.log(positionsArray)
+        console.log(counterArray)
+        for(i=0; i<counterArray.length; i++) {
+            console.log('updating')
+            positionsArray[i].value = i;
+            counterArray[i].innerHTML = i+1;
+        }
+    }
+    
+    const list = document.getElementById('stepsList');
+    let draggingElement = null;
+
+    list.addEventListener('dragstart', (e) => {
+        draggingElement = e.target;
+        e.target.classList.add('dragging');
+    });
+
+    list.addEventListener('dragend', (e) => {
+        e.target.classList.remove('dragging');
+        draggingElement = null;
+        resetPositionNumbers();
+    });
+
+    list.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        const afterElement = getDragAfterElement(list, e.clientY);
+        if (afterElement == null) {
+            list.appendChild(draggingElement);
+        } else {
+            list.insertBefore(draggingElement, afterElement);
+        }
+    });
+
+    function getDragAfterElement(container, y) {
+        const draggableElements = [...container.querySelectorAll('.draggable:not(.dragging)')];
+
+        return draggableElements.reduce((closest, child) => {
+            const box = child.getBoundingClientRect();
+            const offset = y - box.top - box.height / 2;
+            if (offset < 0 && offset > closest.offset) {
+                return { offset: offset, element: child };
+            } else {
+                return closest;
+            }
+        }, { offset: Number.NEGATIVE_INFINITY }).element;
+    }
+
+    function addTestStep() {
+        // Копирование элмента и изменение итогового значения форм
+        let totalForms = totalForm.value;
+        let addStep = step.cloneNode(true);
+        addStep.classList.remove('hide')
+        let action = addStep.querySelector('textarea:first-of-type')
+        let expected_result = addStep.querySelector('textarea:last-of-type')
+        let position = addStep.querySelector('input:first-of-type')
+        let id = addStep.querySelector('input:last-of-type')
+
+        action.name = 'form-' + totalForms + '-action'
+        action.id = 'id_form-' + totalForms + '-action'
+        expected_result.name = 'form-' + totalForms + '-expected_result'
+        expected_result.id = 'id_form-' + totalForms + '-expected_result'
+        position.name = 'form-' + totalForms + '-position'
+        position.id = 'id_form-' + totalForms + '-position' 
+        id.name = 'form-' + totalForms + '-id'
+        id.id = 'id_form-' + totalForms + '-id'
+
+        stepList.append(addStep);
+        resetPositionNumbers();
+
+        totalForms++;
+        totalForm.value = totalForms;
+    }
+
+</script>
+
 {% endblock %}

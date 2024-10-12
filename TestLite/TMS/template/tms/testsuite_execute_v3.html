@@ -1,0 +1,53 @@
+{% extends 'main.html' %}
+
+{% block content %}
+<form action="" method="post">
+    {% csrf_token %}
+    <div class="form-con">
+        <div class="left">
+            {% for testcase in testcases%}
+            <div class="teststeps">
+                <h3>{{ testcase.key }} {{ testcase.name }}</h3>
+                {% for teststep in testcase.get_test_steps %}
+                    <div class="teststep">
+                        <textarea name="" id="">{{ teststep.action }}</textarea>
+                        <textarea name="" id="">{{ teststep.expected_result }}</textarea> 
+                        <select name="{{ testcase.key }}" id="{{ forloop.counter }}">
+                            <option value="" selected="">---------</option>
+                            <option value="P">Успешно</option>
+                            <option value="S">Пропущено</option>
+                            <option value="E">Ошибка</option>
+                            <option value="F">Провал</option>
+                        </select>
+                    </div>
+                {% endfor %}
+            </div>
+            {% endfor %}
+        </div>
+        <div class="right">
+            {% for testcase in testcases %}
+            <div class="border" onclick="showExecuteFrame(this)" execute-frame="{{ testcase.pk }}">
+                {{ testcase }}
+            </div>
+            {% endfor %}
+            <button type="submit" class="green-btn btn">Сохранить</button>
+        </div>
+    </div>
+</form>
+
+<script>
+function showExecuteFrame(element) {
+    attrValue = element.getAttribute('execute-frame');
+    allFrames = document.getElementsByClassName('execute-frame');
+    for (i=0; i<allFrames.length; i++){
+        console.log('lol');
+        console.log(allFrames[i]);
+        allFrames[i].style.display = "none";
+    }
+    var unhideFrame = document.getElementsByClassName('execute-frame-' + attrValue);
+    unhideFrame[0].style.display = "block";
+  }
+</script>
+
+
+{% endblock %}

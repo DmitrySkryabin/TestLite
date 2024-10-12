@@ -1,7 +1,38 @@
 {% extends 'main.html' %}
 
 {% block content %}
-    {% for project in object_list %}
-        <a href="{% url 'TMS:testcases' project %}">{{ project }}</a> <br>
-    {% endfor %}
+<div class="container-fluid h-100">
+    <div class="row h-6dot4">
+        <div class="container d-flex align-items-center">
+            <button class="btn btn-sm btn-warning">Создать проект</button>
+        </div>
+    </div>
+    <div class="row h-93dot6">
+        <div class="container">
+            <div class="table-container border rounded-top h-100">
+                <table class="table table-sm table-responsive">
+                    <thead class="table-light">
+                        <tr>
+                            <th scope="col-auto">#</th>
+                            <th scope="col">Ключ</th>
+                            <th scope="col">Название</th>
+                            <th scope="col">Тест кейсы</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for project in object_list %}
+                        <tr onclick="goToFromTable(this)" class="table-row-clickable" href="{% url 'TMS:testcases' project.key %}">
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ project.key }}</td>
+                            <td>{{ project.name }}</td>
+                            <td>{{ project.testcase_set.all.count }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
 {% endblock %}

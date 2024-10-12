@@ -1,61 +1,170 @@
-
 {% extends 'main.html' %}
 
 {% block content %}
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-md-8">
-            <h3>{{ object.name }}</h3>
-            <p>{{ object.description }}</p>
-            <table class="table table-bordered">
-                <thead>
-                    <tr>
-                        <th colspan="2"><h4>Шаги теста</h4></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for teststep in testcase_steps %}
-                    <tr>
-                        <td>{{ teststep.action }}</td>
-                        <td>{{ teststep.expected_result }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-            <table class="table table-bordered">
-                <thead>
-                    <tr>
-                        <th colspan="5"><h4>Прогоны тестов</h4></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for testcaserun in testcaseruns %}
-                    <tr>
-                        <td>{{ forloop.counter }}</td>
-                        <td>{{ testcaserun }}</td>
-                        <td>{{ testcaserun.start_time }}</td>
-                        <td><span class="badge badge-{{ testcaserun.type }}">{{ testcaserun.get_type_display }}</span></td>
-                        <td><span class="badge badge-{{ testcaserun.status }}">{{ testcaserun.get_status_display }}</span></td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+<div class="container-fluid h-100">
+    <div class="row h-100">
+        <div class="col-auto pt-2 border-end">
+            <a href="{% url 'TMS:testcases' request.resolver_match.kwargs.project %}" class="btn btn-warning">
+                <i class="bi bi-arrow-left"></i></a>
         </div>
-        <div class="col-md-4">
-            <table class="table">
-                <tr><td><b>Версия: </b>{{ object.version }}</td></tr>
-                <tr><td><b>Автор: </b>{{ object.author }}</td></tr>
-                <tr><td><b>Создан: </b>{{ object.created_on }}</td></tr>
-                <tr><td><b>Обновлен: </b>{{ object.updated_on }}</td></tr>
-                <tr><td><b>Приоритет: </b>{{ object.priority }}</td></tr>
-                <tr><td>---------------------------</td></tr>
-                <tr><td><fieldset class="border p-2"><legend class="w-auto">Предусловия:</legend><p>{{ object.preconditions }}</p></fieldset></td></tr>
-                <tr><td><fieldset class="border p-2"><legend class="w-auto">Постусловия:</legend><p>{{ object.postconditions }}</p></fieldset></td></tr>
-                <tr><td><fieldset class="border p-2"><legend class="w-auto">Параметры:</legend><p>{{ object.parameters }}</p></fieldset></td></tr>
-                <tr><td><a href="{% url 'TMS:testcase_update' request.resolver_match.kwargs.project object.id %}" class="btn btn-success">Редактировать</a></td></tr>
-            </table>
+        <div class="col h-100">
+            <div class="row h-6dot4 border-bottom">
+                <div class="container pb-2 pt-2">
+                    <div class="row">
+                        <div class="col-1 d-flex align-items-center">
+                            <h5>{{ object.key }}</h5>
+                        </div>
+                        <div class="col-9 d-flex align-items-center">
+                            <h5>{{ object.name }}</h5>
+                        </div>
+                        <div class="col-md-2 d-flex justify-content-between align-items-center">
+                            <a href="{% url 'TMS:testcase_update' request.resolver_match.kwargs.project object.id %}"
+                                class="btn btn-warning">Редактировать</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row h-93dot6">
+                <div class="col-md-1 border-end pb-2 pt-2">
+                    <div class="nav flex-column nav-pills me-3" id="v-pills-tab" role="tablist"
+                        aria-orientation="vertical">
+                        <button class="nav-link active d-flex mb-1" id="teststeps-tab" data-bs-toggle="pill"
+                            data-bs-target="#teststeps" type="button" role="tab" aria-controls="teststeps"
+                            aria-selected="true">Шаги теста</button>
+                        <button class="nav-link d-flex mb-1" id="other-tab" data-bs-toggle="pill"
+                            data-bs-target="#other" type="button" role="tab" aria-controls="other"
+                            aria-selected="false">Запуски</button>
+                        <button class="nav-link d-flex mb-1" id="parameters-tab" data-bs-toggle="pill"
+                            data-bs-target="#parameters" type="button" role="tab" aria-controls="parameters"
+                            aria-selected="false">Параметры</button>
+                        <button class="nav-link d-flex mb-1" id="description-tab" data-bs-toggle="pill"
+                            data-bs-target="#description" type="button" role="tab" aria-controls="description"
+                            aria-selected="false">Описание</button>
+                    </div>
+                </div>
+                <div class="col-md-8 border-end pb-2 not-padd h-100 overflow-auto">
+                    <div class="tab-content pt-2 h-100" id="v-pills-tabContent">
+                        <div class="tab-pane fade show active" id="teststeps" role="tabpanel"
+                            aria-labelledby="teststeps">
+                            <div class="container testcase-collapse-content">
+                                <div class="row">
+                                    <p class="collapse-link collapsed" data-bs-toggle="collapse" href="#CollapsePrecondition" role="button"
+                                        aria-expanded="false" aria-controls="CollapsePrecondition">
+                                        Предусловия</p>
+                                    <div class="collapse " id="CollapsePrecondition">
+                                        <p class="form-control">{{ object.preconditions }}</p>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <p class="collapse-link" data-bs-toggle="collapse" href="#CollapseSteps" role="button"
+                                        aria-expanded="true" aria-controls="CollapseSteps">
+                                        Шаги</p>
+                                    <div class="collapse show mb-2" id="CollapseSteps">
+                                        {% for teststep in testcase_steps %}
+                                        <ul class="list-group list-group-horizontal mb-1 teststep">
+                                            <li class="list-group-item bg-secondary text-light col-teststep-counter">{{ forloop.counter }}</li>
+                                            <li class="list-group-item col">{{ teststep.action }}</li>
+                                            <li class="list-group-item col">{{ teststep.expected_result }}</li>
+                                        </ul>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <p class="collapse-link collapsed" data-bs-toggle="collapse" href="#CollapsePostcondition" role="button"
+                                        aria-expanded="false" aria-controls="CollapsePostcondition">
+                                        Постусловия</p>
+                                    <div class="collapse " id="CollapsePostcondition">
+                                        <p class="form-control">{{ object.postconditions }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade h-100" id="other" role="tabpanel" aria-labelledby="other">
+                            <div class="container h-100">
+                                <div class="table-container border rounded-top h-100">
+                                    <table class="table table-sm">
+                                        <thead class="thead-light">
+                                            <tr>
+                                                <th scope="col">#</th>
+                                                <th scope="col">Дата</th>
+                                                <th scope="col">Тип</th>
+                                                <th scope="col">Статус</th>
+                                                <th scope="col">Тест суит</th>
+                                                <th scope="col">Результаты Тест суит</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for testcaserun in testcaseruns%}
+                                            <tr>
+                                                <td>{{ forloop.counter }}</td>
+                                                <td>{{ testcaserun.stop_time|date:"d.m.Y в H:i" }}</td>
+                                                <td><span class="badge {{ testcaserun.type|type_bootstrap_class }}">{{ testcaserun.get_type_display }}</span></td>
+                                                <td><span class="badge {{ testcaserun.status|status_bootstrap_class }}">{{ testcaserun.get_status_display }}</span></td>
+                                                <td><a href="{% url 'TMS:testsuite_detail' request.resolver_match.kwargs.project testcaserun.test_suite_run.test_suite.pk %}">{{ testcaserun.test_suite_run.test_suite }}</a></td>
+                                                <td><a href="{% url 'TMS:testsuiterun_detail' request.resolver_match.kwargs.project testcaserun.test_suite_run.test_suite.pk testcaserun.test_suite_run.pk %}">Результаты</a></td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade h-100" id="parameters" role="tabpanel" aria-labelledby="parameters">
+                            <div class="container h-100">
+                                <input id="parameters-pre-value" type="hidden" value="{{ testcase_parameters_as_text }}">
+                                <pre class="form-control h-100" id="parameters-pre"></pre>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade h-100" id="description" role="tabpanel" aria-labelledby="description">
+                            <div class="container h-100">
+                                <textarea name="" id="" class="form-control h-100" readonly>{{ object.description }}</textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 pb-2 pt-2 h-100 overflow-auto">
+                    <div class="container">
+                        <div class="row mb-2"> 
+                            <label for="testCaseVersion" class="col-4 col-form-label">Версия</label>
+                            <div class="col">
+                                <span id="testCaseVersion" class="form-control">{{ object.version }}</span>
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <label for="testCaseAuthor" class="col-4 col-form-label">Автор</label>
+                            <div class="col">
+                                <span id="testCaseAuthor" class="form-control">{{ object.author }}</span>
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <label for="testCasePriority" class="col-4 col-form-label">Приоритет</label>
+                            <div class="col">
+                                <span id="testCasePriority" class="form-control {{ object.priority|priority_bootstrap_class }}">{{ object.get_priority_display }}</span>
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <label for="testCaseParameters" class="col-4 col-form-label">Параметры</label>
+                            <div class="col">
+                                <textarea name="" id="testCaseParameters" class="form-control" readonly>{{ object.parameters }}</textarea>
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <label for="testCaseDescription" class="col-4 col-form-label">Описание</label>
+                            <div class="col">
+                                <textarea name="" id="testCaseDescription" class="form-control" readonly>{{ object.description }}</textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
+<script>
+    const parametersPre = document.getElementById("parameters-pre");
+    const paranetersTextArea = document.getElementById("testCaseParameters");
+    const json = JSON.parse(document.getElementById("parameters-pre-value").value);
+    parametersPre.textContent = JSON.stringify(json, undefined, 2)
+    paranetersTextArea.textContent = JSON.stringify(json, undefined, 2)
+</script>
 {% endblock %}
-

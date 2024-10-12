@@ -1,4 +1,5 @@
 import math
+from typing import Any
 
 from django import forms
 from .models import TestStep, TestCase, TestSuite, TestSuiteRun, TestCaseRun, TestStepRun
@@ -19,10 +20,21 @@ class TestCaseForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         item:TestCase = kwargs.get('instance')
-        self.fields['description'].widget.attrs.update({'rows': f'{math.ceil(len(item.description)/124)}', 'onkeyup': 'textAreaAdjust(this)'})
-        self.fields['preconditions'].widget.attrs.update({'rows': f'{math.ceil(len(item.preconditions)/50)}', 'onkeyup': 'textAreaAdjust(this)'})
-        self.fields['postconditions'].widget.attrs.update({'rows': f'{math.ceil(len(item.postconditions)/50)}', 'onkeyup': 'textAreaAdjust(this)'})
-        self.fields['parameters'].widget.attrs.update({'rows': f'{math.ceil(len(item.parameters)/50)}', 'onkeyup': 'textAreaAdjust(this)'})
+        self.fields['name'].widget.attrs.update({'class': 'form-control me-2'})
+        self.fields['priority'].widget.attrs.update({'class': 'form-control me-2'})
+        self.fields['description'].widget.attrs.update({'onkeyup': 'textAreaAdjust(this)', 'class': 'form-control h-100'})
+        self.fields['preconditions'].widget.attrs.update({'onkeyup': 'textAreaAdjust(this)', 'class': 'form-control'})
+        self.fields['postconditions'].widget.attrs.update({'onkeyup': 'textAreaAdjust(this)', 'class': 'form-control'})
+        self.fields['parameters'].widget.attrs.update({'onkeyup': 'textAreaAdjust(this)', 'class': 'form-control h-100', 'id': 'testCaseParameters'})
+
+
+
+class TestCaseFormset(forms.BaseModelFormSet):
+
+    def add_fields(self, form, index):
+        super().add_fields(form, index)
+        if 'DELETE' in form.fields:
+            form.fields['DELETE'].widget = forms.HiddenInput()
 
 
 
@@ -51,8 +63,8 @@ class TestStepForm(forms.ModelForm):
         else:
             self.fields['action'].widget.attrs.update({'rows': '1'})
             self.fields['expected_result'].widget.attrs.update({'rows': '1'})
-        self.fields['action'].widget.attrs.update({'onkeyup': 'textAreaAdjust(this)'})
-        self.fields['expected_result'].widget.attrs.update({'onkeyup': 'textAreaAdjust(this)'})
+        self.fields['action'].widget.attrs.update({'onkeyup': 'textAreaAdjust(this)', 'class': ' list-group-item col'})
+        self.fields['expected_result'].widget.attrs.update({'onkeyup': 'textAreaAdjust(this)', 'class': ' list-group-item col'})
 
 
 

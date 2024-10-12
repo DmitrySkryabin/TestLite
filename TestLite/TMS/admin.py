@@ -3,6 +3,7 @@ from .models import *
 
 # Register your models here.
 admin.site.register(Project)
+admin.site.register(TestCaseFolder)
 admin.site.register(TestCase)
 admin.site.register(TestStep)
 admin.site.register(TestCaseRun)

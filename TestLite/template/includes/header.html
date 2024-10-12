@@ -1,10 +1,31 @@
-<div class="header">
-    <nav>
-        <ul>
+<header class="bg-dark text-white h-6dot4">
+    <div class="container-fluid h-100">
+        <div class="d-flex flex-wrap align-items-center justify-content-center h-100">
+            <h3><a href="{% url 'TMS:projects' %}" class="text-white nav-link">TestLite</a></h3>
             {% if request.resolver_match.kwargs.project %}
-            <li><a href="{% url 'TMS:testcases' request.resolver_match.kwargs.project %}">Тест кейсы</a></li>
-            <li><a href="{% url 'TMS:testsuites' request.resolver_match.kwargs.project %}">Тест суиты</a></li>
+            <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
+                <li><a href="{% url 'TMS:testcases' request.resolver_match.kwargs.project %}"
+                        class="nav-link  text-white">Тест кейсы</a></li>
+                <li><a href="{% url 'TMS:testsuites' request.resolver_match.kwargs.project %}"
+                        class="nav-link px-0 text-white">Тест суиты</a></li>
+            </ul>
+            {% else %}
+            <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
+            </ul>
             {% endif %}
-        </ul>
-    </nav>
-</div>
+            <div class="text-end">
+                <div class="dropdown">
+                    <button class="btn btn-warning btn-circle" type="button" id="dropdownMenuButton1"
+                        data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-person"></i>
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                        <li><a class="dropdown-item" href="#">Аккаунт ({{ request.user }})</a></li>
+                        <li><a class="dropdown-item" href="#">Выйти</a></li>
+                    </ul>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</header>
