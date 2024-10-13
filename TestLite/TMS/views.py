@@ -12,7 +12,7 @@ from django.views.generic import ListView, DetailView, UpdateView, TemplateView,
 from django.forms import BaseModelForm, modelformset_factory
 from .models import Project, TestCase, TestStep, TestSuite, TestSuiteRun, TestStepRun, TestCaseRun, TestCaseFolder
 from .models import STATUS, PRIORITY, TYPE
-from .forms import TestStepForm, TestCaseForm, TestSuiteForm, TestStepRunForm, TestStepRunFormset, TestCaseFormset
+from .forms import ProjectForm, TestStepForm, TestCaseForm, TestSuiteForm, TestStepRunForm, TestStepRunFormset, TestCaseFormset
 from .service import TestSuiteSaveHelper
 
 # Create your views here.
@@ -20,6 +20,15 @@ from .service import TestSuiteSaveHelper
 
 class ProjectListView(ListView):
     model = Project
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['project_form'] = ProjectForm()
+        return context
+
+    def post(request, *args, **kwargs):
+        print(request)
+        return HttpResponse('test')
 
 
 class TestCaseListView(ListView):

@@ -2,7 +2,21 @@ import math
 from typing import Any
 
 from django import forms
-from .models import TestStep, TestCase, TestSuite, TestSuiteRun, TestCaseRun, TestStepRun
+from .models import Project, TestStep, TestCase, TestSuite, TestSuiteRun, TestCaseRun, TestStepRun
+
+
+class ProjectForm(forms.ModelForm):
+    class Meta:
+        model = Project
+        fields = [
+            'name',
+            'key'
+        ]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['name'].widget.attrs.update({'class': 'form-control', 'id': 'projectName'})
+        self.fields['key'].widget.attrs.update({'class': 'form-control', 'id': 'projectKey', 'oninput': 'this.value = this.value.toUpperCase()', 'pattern': '\p{sc=Latin}*'})
 
 
 class TestCaseForm(forms.ModelForm):

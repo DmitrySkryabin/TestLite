@@ -4,7 +4,8 @@
 <div class="container-fluid h-100">
     <div class="row h-6dot4">
         <div class="container d-flex align-items-center">
-            <button class="btn btn-sm btn-warning">Создать проект</button>
+            <button class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#addProjectModal">Создать
+                проект</button>
         </div>
     </div>
     <div class="row h-93dot6">
@@ -21,7 +22,8 @@
                     </thead>
                     <tbody>
                         {% for project in object_list %}
-                        <tr onclick="goToFromTable(this)" class="table-row-clickable" href="{% url 'TMS:testcases' project.key %}">
+                        <tr onclick="goToFromTable(this)" class="table-row-clickable"
+                            href="{% url 'TMS:testcases' project.key %}">
                             <td>{{ forloop.counter }}</td>
                             <td>{{ project.key }}</td>
                             <td>{{ project.name }}</td>
@@ -31,6 +33,33 @@
                     </tbody>
                 </table>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- <div class="modal-dialog modal-dialog-centered" id="addProjectModal">
+    adkasldasld
+  </div> -->
+<div class="modal fade" id="addProjectModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form action="" method="post"></form>
+            <div class="modal-header">
+                <h5 class="modal-title">Добавление проекта</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                {% csrf_token %}
+                <label for="projectName" class="form-label">Название</label>
+                {{ project_form.name }}
+                <label for="projectKey" class="form-label">Ключ</label>
+                {{ project_form.key }}
+                <div id="keyHelp" class="form-text">Придумайте ключ для проекта, короткий и понятный. <span class="fw-bold">Используйте латинскую расскладку</span></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-warning btn-sm" type="submit">Добавить</button>
+            </div>
+            </form>
         </div>
     </div>
 </div>
