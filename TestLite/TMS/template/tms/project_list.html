@@ -37,31 +37,112 @@
     </div>
 </div>
 
-<!-- <div class="modal-dialog modal-dialog-centered" id="addProjectModal">
-    adkasldasld
-  </div> -->
 <div class="modal fade" id="addProjectModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <form action="" method="post"></form>
-            <div class="modal-header">
-                <h5 class="modal-title">Добавление проекта</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                {% csrf_token %}
-                <label for="projectName" class="form-label">Название</label>
-                {{ project_form.name }}
-                <label for="projectKey" class="form-label">Ключ</label>
-                {{ project_form.key }}
-                <div id="keyHelp" class="form-text">Придумайте ключ для проекта, короткий и понятный. <span class="fw-bold">Используйте латинскую расскладку</span></div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-warning btn-sm" type="submit">Добавить</button>
-            </div>
+            <form action="" method="post" class="needs-validation" novalidate>
+                <div class="modal-header">
+                    <h5 class="modal-title">Добавление проекта</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    {% csrf_token %}
+                    <div class="">
+                        <label for="projectName" class="form-label">Название</label>
+                        {{ project_form.name }}
+                        <div class="invalid-feedback">
+                            Это обязательное поле
+                        </div>
+                    </div>
+                    <div class="">
+                        <label for="projectKey" class="form-label">Ключ</label>
+                        {{ project_form.key }}
+                        <div class="invalid-feedback" id="key-invalid-feedback">
+                            Это обязательное поле
+                        </div>
+                        <div id="keyHelp" class="form-text">Придумайте ключ для проекта, короткий и понятный. <span
+                                class="fw-bold">Используйте латинскую расскладку</span></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-warning btn-sm" type="submit">Добавить</button>
+                </div>
             </form>
         </div>
     </div>
 </div>
 
+<script>
+    const projectKeyInput = document.getElementById('projectKey');
+    const keyInvalidFeedback = document.getElementById('key-invalid-feedback');
+
+    document.querySelector('form').addEventListener('keydown', function(event) {
+        if(event.keyCode == 13) {
+            event.preventDefault();
+            return false;
+        }
+    });
+
+    projectKeyInput.addEventListener('keyup', function(e) {
+        projectKeyInput.value = projectKeyInput.value.toUpperCase();
+        if (projectKeyInput.value == ""){
+            keyInvalidFeedback.innerHTML = 'Это обязательное поле';
+        }
+        if (e.key.toUpperCase().match('[A-Z]')){
+            projectKeyInput.classList.add('is-valid');
+            projectKeyInput.classList.remove('is-invalid');
+            projectKeyInput.setCustomValidity("")
+        }
+        else {
+            projectKeyInput.value = projectKeyInput.value.slice(0,-1);
+            projectKeyInput.classList.add('is-invalid');
+            projectKeyInput.setCustomValidity("Invalid field.")
+            keyInvalidFeedback.innerHTML = 'Используйте только латинские буквы';
+        }
+    });
+
+    async function checkProjectKeyToExistName(elem) {
+        const curUrl = window.location.href
+        const request = new Request(
+            curUrl + 'check_project_key/' + elem.value,
+            {
+                method: 'GET',
+            }
+        );
+        try {
+            let response = await fetch(request);
+            let json = await response.json();
+            elem.classList.add('is-valid');
+            elem.classList.remove('is-invalid');
+            elem.setCustomValidity("")
+            if (json['is_exist'] == true) {
+                elem.classList.add('is-invalid');
+                elem.setCustomValidity("Invalid field.")
+                keyInvalidFeedback.innerHTML = 'Проект с таким ключом уже существует';
+            }
+        } catch (err) {
+            console.log(err);
+        }
+    }
+
+    (() => {
+        'use strict'
+
+        // Fetch all the forms we want to apply custom Bootstrap validation styles to
+        const forms = document.querySelectorAll('.needs-validation')
+
+        // Loop over them and prevent submission
+        Array.from(forms).forEach(form => {
+            form.addEventListener('submit', event => {
+                if (!form.checkValidity()) {
+                    event.preventDefault()
+                    event.stopPropagation()
+                }
+
+                form.classList.add('was-validated')
+            }, false)
+        })
+    })()
+
+</script>
 {% endblock %}

@@ -5,6 +5,7 @@ app_name = 'TMS'
 
 urlpatterns = [
     path('', views.ProjectListView.as_view(), name='projects'),
+    path('check_project_key/<slug:project>', views.ProjectListView.check_project_key, name='chek_project_key'),
     path('<slug:project>/testcases', views.TestCaseListView.as_view(), name='testcases'),
     path('<slug:project>/testcase/<int:pk>', views.TestCaseDetailView.as_view(), name='testcase_detail'),
     path('<slug:project>/testcase/create', views.TestCaseCreateView.as_view(), name='testcase_create'),

@@ -16,7 +16,12 @@ class ProjectForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['name'].widget.attrs.update({'class': 'form-control', 'id': 'projectName'})
-        self.fields['key'].widget.attrs.update({'class': 'form-control', 'id': 'projectKey', 'oninput': 'this.value = this.value.toUpperCase()', 'pattern': '\p{sc=Latin}*'})
+        self.fields['key'].widget.attrs.update({
+            'class': 'form-control', 
+            'id': 'projectKey', 
+            'pattern': '\p{sc=Latin}*',
+            'onchange': 'checkProjectKeyToExistName(this)'
+            })
 
 
 class TestCaseForm(forms.ModelForm):

@@ -26,9 +26,19 @@ class ProjectListView(ListView):
         context['project_form'] = ProjectForm()
         return context
 
-    def post(request, *args, **kwargs):
-        print(request)
-        return HttpResponse('test')
+    def post(self, request, *args, **kwargs):
+        project = Project()
+        project.name = request.POST['name']
+        project.key = request.POST['key']
+        project.save()
+        return redirect(reverse('TMS:projects'))
+    
+    def check_project_key(self, project, *args, **kwargs):
+        result = Project.objects.filter(key=project).first()
+        if result is None:
+            return JsonResponse({'is_exist': False})
+        else:
+            return JsonResponse({'is_exist': True})
 
 
 class TestCaseListView(ListView):
