@@ -1,0 +1,65 @@
+{% with id=widget.attrs.id %}
+<table {% if id %} id="{{ id }}" {% endif %} class="table table-sm table-responsive {% if widget.attrs.class %}{{ widget.attrs.class }}{% endif %}">
+  <thead class="table-light">
+    <tr>
+      <td><input type="checkbox" onclick="checkAllCheckBoxes(this)" id="checkAllCheckboxes"></td>
+      <td>Ключ</td>
+      <td>Название</td>
+      <td>Версия</td>
+      <td>Приоритет</td>
+    </tr>
+  </thead>
+  <tbody>
+    {% for testcase in testcases %}
+      <tr onclick="checkUncheckCheckbox(this)" class="table-row-clickable">
+        <td><input type="checkbox" name="test_cases" value="{{ testcase.pk }}" id="id_test_cases_{{ forloop.counter0 }}" onclick="this.click()"></td>
+        <td>{{ testcase.key }}</td>
+        <td>{{ testcase.name }}</td>
+        <td>{{ testcase.version }}</td>
+        <td><span class="badge {{ testcase.priority|priority_bootstrap_class }}">{{ testcase.get_priority_display }}</span></td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+<script>
+
+  let checkedCheckboxes = 0;
+  const allCheckBoxes = document.querySelectorAll('input[type=checkbox][name=test_cases]');
+
+  function checkAllCheckBoxes(elem) {
+    if (elem.checked == true) {
+      allCheckBoxes.forEach((checkbox) => {
+        checkbox.checked = true;
+      });
+    }
+    else {
+      allCheckBoxes.forEach((checkbox) => {
+        checkbox.checked = false;
+      });
+    }
+  };
+
+  function checkUncheckCheckbox(elem) {
+    const checkbox = elem.querySelector('input[type=checkbox]');
+    checkbox.click();
+  };
+
+  allCheckBoxes.forEach(function(item) {
+    item.addEventListener('change', function(event) {
+      if (event.target.checked == true) {
+        checkedCheckboxes++;
+      }
+      else {
+        checkedCheckboxes--;
+      }
+      if (checkedCheckboxes == allCheckBoxes.length) {
+        document.getElementById('checkAllCheckboxes').checked = true;
+      }
+      else {
+        document.getElementById('checkAllCheckboxes').checked = false;
+      }
+    })
+  });
+
+</script>
+{% endwith %}

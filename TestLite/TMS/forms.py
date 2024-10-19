@@ -2,7 +2,9 @@ import math
 from typing import Any
 
 from django import forms
-from .models import Project, TestStep, TestCase, TestSuite, TestSuiteRun, TestCaseRun, TestStepRun
+from django.forms.renderers import BaseRenderer
+from django.utils.safestring import SafeText
+from .models import Project, TestStep, TestCase, TestCaseFolder, TestSuite, TestSuiteRun, TestCaseRun, TestStepRun
 
 
 class ProjectForm(forms.ModelForm):
@@ -23,6 +25,36 @@ class ProjectForm(forms.ModelForm):
             'onchange': 'checkProjectKeyToExistName(this)'
             })
 
+    
+
+class TableModelMultipleChoiceField(forms.CheckboxSelectMultiple):
+    template_name = "TMS/widgets/table_multiple_choice.html"
+
+    def get_context(self, *args, **kwargs):
+        context = super().get_context(*args, **kwargs)
+        context['testcases'] = [item[0].instance for item in self.choices]
+        return context
+
+
+class TestCaseFolderForm(forms.ModelForm):
+    class Meta:
+        model = TestCaseFolder
+        fields = [
+            'name',
+            'test_cases'
+        ]
+
+    def __init__(self, project, *args, **kwargs):
+        self.queryset = TestCaseFolder.objects.filter(project=project)
+        super().__init__(*args, **kwargs)
+        self.fields['name'].widget.attrs.update({'class': 'form-control', 'id': 'folderName'})
+        self.fields['test_cases'] = forms.ModelMultipleChoiceField(
+            queryset=TestCase.objects.filter(project=project),
+            widget=TableModelMultipleChoiceField,
+            required=False
+        )
+
+
 
 class TestCaseForm(forms.ModelForm):
     class Meta:
@@ -39,7 +71,7 @@ class TestCaseForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         item:TestCase = kwargs.get('instance')
-        self.fields['name'].widget.attrs.update({'class': 'form-control me-2'})
+        self.fields['name'].widget.attrs.update({'class': 'form-control me-2', 'placeholder': 'Название тест кейса'})
         self.fields['priority'].widget.attrs.update({'class': 'form-control me-2'})
         self.fields['description'].widget.attrs.update({'onkeyup': 'textAreaAdjust(this)', 'class': 'form-control h-100'})
         self.fields['preconditions'].widget.attrs.update({'onkeyup': 'textAreaAdjust(this)', 'class': 'form-control'})
@@ -52,8 +84,8 @@ class TestCaseFormset(forms.BaseModelFormSet):
 
     def add_fields(self, form, index):
         super().add_fields(form, index)
-        if 'DELETE' in form.fields:
-            form.fields['DELETE'].widget = forms.HiddenInput()
+        # if 'DELETE' in form.fields:
+        #     form.fields['DELETE'].widget = forms.HiddenInput()
 
 
 

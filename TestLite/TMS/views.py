@@ -5,6 +5,7 @@ from django.db.models.base import Model as Model
 from django.db.models.query import QuerySet
 from django.http import HttpResponse, JsonResponse
 from django.utils import timezone
+from django.contrib import messages
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
@@ -12,7 +13,7 @@ from django.views.generic import ListView, DetailView, UpdateView, TemplateView,
 from django.forms import BaseModelForm, modelformset_factory
 from .models import Project, TestCase, TestStep, TestSuite, TestSuiteRun, TestStepRun, TestCaseRun, TestCaseFolder
 from .models import STATUS, PRIORITY, TYPE
-from .forms import ProjectForm, TestStepForm, TestCaseForm, TestSuiteForm, TestStepRunForm, TestStepRunFormset, TestCaseFormset
+from .forms import ProjectForm, TestStepForm, TestCaseForm, TestCaseFolderForm, TestSuiteForm, TestStepRunForm, TestStepRunFormset, TestCaseFormset
 from .service import TestSuiteSaveHelper
 
 # Create your views here.
@@ -50,6 +51,7 @@ class TestCaseListView(ListView):
         else:
             return TestCase.objects.filter(project__key=self.kwargs.get('project'))
 
+
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
         context['project'] = Project.objects.get(key=self.kwargs.get('project'))
@@ -58,8 +60,29 @@ class TestCaseListView(ListView):
                 obj.status = TestCaseRun.objects.filter(test_case=obj).last().status
             else:
                 obj.status = None
+        context['testcase_all_count'] = TestCase.objects.filter(project=context['project']).count
         context['testcase_folders'] = TestCaseFolder.objects.filter(project=context['project'])
+        context['testcase_folder_form'] = TestCaseFolderForm(context['project'])
         return context
+    
+
+    def post(self, request, *args, **kwargs):
+        self.object_list = self.get_queryset()
+        testcase_folder_form = TestCaseFolderForm(Project.objects.get(key=kwargs.get('project')), request.POST)
+        if testcase_folder_form.is_valid():
+            folder: TestCaseFolder = testcase_folder_form.save(commit=False)
+            folder.project = Project.objects.get(key=kwargs.get('project'))
+            folder.save()
+            for testcase in testcase_folder_form.cleaned_data.get('test_cases'):
+                folder.test_cases.add(testcase)
+            return redirect(reverse('TMS:testcases', kwargs={'project': kwargs.get('project')}))
+        else:
+            messages.error(request, 'Не удалось создать группу')
+            return redirect(reverse('TMS:testcases', kwargs={'project': kwargs.get('project')}))
+            # return self.render_to_response({
+            #     'add_folder_error': '',
+            #     **self.get_context_data()
+            # })
     
 
 class TestCaseDetailView(DetailView):
@@ -99,8 +122,12 @@ class TestCaseUpdateView(UpdateView):
         if context['testcase_step_formset'].is_valid():
             testcase = form.save()
             for teststep in context['testcase_step_formset'].save(commit=False):
+                print(teststep)
                 teststep.test_case = testcase
                 teststep.save()
+            for teststep in context['testcase_step_formset'].deleted_objects:
+                print(teststep)
+                teststep.delete()
         else:
             print(context['testcase_step_formset'].errors)
 

@@ -20,7 +20,7 @@
                                 {{ form.name }}
                             </div>
                             <div class="col-md-2 d-flex justify-content-between align-items-center">
-                                <button type="submit" class="btn btn-warning">Сохранить</button>
+                                <button type="submit" class="btn btn-success">Сохранить</button>
                             </div>
                         </div>
                     </div>
@@ -63,12 +63,21 @@
                                                 <textarea name="" cols="1" rows="1" onkeyup="textAreaAdjust(this)" class=" list-group-item col" id=""></textarea>
                                                 <input type="hidden" name="" value="0" id="">
                                                 <input type="hidden" name="" value="" id="">
+                                                <input type="hidden" name="" value="" id="">
+                                                <div class="dropdown">
+                                                    <a class="btn btn-secondary btn-sm" href="#" role="button" id="" data-bs-toggle="dropdown" aria-expanded="false">
+                                                        <i class="bi bi-three-dots"></i>
+                                                    </a>
+                                                    <ul class="dropdown-menu" aria-labelledby="">
+                                                      <li><a class="dropdown-item text-danger" href="#" teststep-id="">Удалить</a></li>
+                                                    </ul>
+                                                  </div>
                                                 <textarea name="" cols="1" rows="1" onkeyup="textAreaAdjust(this)" class=" list-group-item col" id=""></textarea>
                                             </ul>
                                             {{ testcase_step_formset.management_form }}
                                             <div class="list-group" id="stepsList">
                                                 {% for teststep in testcase_step_formset %}
-                                                    <ul class="list-group list-group-horizontal mb-1 draggable teststep" draggable="true">
+                                                    <ul class="list-group list-group-horizontal mb-1 draggable teststep" draggable="true" id="testStep{{ forloop.counter0 }}">
                                                         <li class="list-group-item bg-secondary text-light col-teststep-counter">{{ forloop.counter }}</li>
                                                         {{ teststep.action }}
                                                         {{ teststep.position.as_hidden }}
@@ -79,14 +88,14 @@
                                                                 <i class="bi bi-three-dots"></i>
                                                             </a>
                                                             <ul class="dropdown-menu" aria-labelledby="testStepActions{{ forloop.counter0 }}">
-                                                              <li><a class="dropdown-item text-danger" href="#" onclick="markForDeleting(this)" teststep-id="{{ forloop.counter0 }}">Удалить</a></li>
+                                                              <li><a class="dropdown-item text-danger" href="#" teststep-id="{{ forloop.counter0 }}">Удалить</a></li>
                                                             </ul>
                                                           </div>
                                                         {{ teststep.expected_result }}
                                                     </ul>
                                                 {% endfor %}
                                             </div>
-                                            <button class="btn btn-warning" type="button" onclick="addTestStep()">Добавить шаг</button>
+                                            <button class="btn btn-warning" type="button" id="addTestStep">Добавить шаг</button>
                                         </div>
                                     </div>
                                     <div class="row">
@@ -102,7 +111,7 @@
                             <div class="tab-pane fade h-100" id="parameters" role="tabpanel" aria-labelledby="parameters">
                                 <div class="container h-100">
                                     <div class="h-100 parameters-container">
-                                        <button type="button" class="btn btn-warning beautify-button" onclick="testCaseParametersBeautify()">{}</button>
+                                        <button type="button" class="btn btn-warning beautify-button" id="testCaseParametersBeautify">{}</button>
                                     {{ form.parameters }}
                                     </div>
                                 </div>
@@ -130,45 +139,144 @@
     </div>
 </form>
 
-<script>
+<div class="toast-container position-fixed bottom-0 start-0 p-3">
+</div>
+
+<script type="module">
+
+    document.getElementById('addTestStep').addEventListener('click', function(event) {
+        addTestStep();
+    });
+
+    document.querySelectorAll('a[teststep-id]').forEach((elem) => {
+        elem.addEventListener('click', function(event) {
+            markForDeleting(event.target)
+        })
+    })
 
     document.addEventListener('DOMContentLoaded', function(){
         testCaseParametersBeautify();
     });
+
+    document.getElementById('testCaseParametersBeautify').addEventListener('click', function() {
+        testCaseParametersBeautify();
+    });
+
+    function showToast(elem){
+        const toastContainer = document.querySelector('.toast-container')
+        const toast = document.createElement('div')
+        toast.className = 'toast hide';
+        toast.setAttribute('role', 'alert');
+        toast.setAttribute('aria-live', 'assertive');
+        toast.setAttribute('aria-atomic', 'true');
+        toast.id = 'toastForCopy';
+
+        const toastHeader = document.createElement('div');
+        toastHeader.className = 'toast-header';
+
+        const strong = document.createElement('strong');
+        strong.className = 'me-auto';
+        strong.textContent = 'Шаг удален';
+
+        const closeButton = document.createElement('button');
+        closeButton.type = 'button';
+        closeButton.className = 'btn-close';
+        closeButton.setAttribute('data-bs-dismiss', 'toast');
+        closeButton.setAttribute('aria-label', 'Close');
+
+        toastHeader.appendChild(strong);
+        toastHeader.appendChild(closeButton);
+
+        const toastBody = document.createElement('div');
+        toastBody.className = 'toast-body';
+
+        const restoreButton = document.createElement('button');
+        restoreButton.type = 'button';
+        restoreButton.className = 'btn btn-warning btn-sm';
+        restoreButton.textContent = 'Восстановить';
+        restoreButton.onclick = function(){
+            restoreTestCase(elem);
+        };
+
+        toastBody.appendChild(restoreButton);
+
+        toast.appendChild(toastHeader);
+        toast.appendChild(toastBody);
+
+        toastContainer.append(toast);
+
+        setTimeout(function(){
+            toast.remove();
+        }, 5000);
+
+
+        const toasts = document.querySelectorAll('.toast');
+        toasts.forEach(toast => new window.bootstrap.Toast(toast).show());
+    }
+
+    function restoreTestCase(elem){
+        elem.classList.remove('hide');
+        const deleteInput = elem.querySelector('input[name$=DELETE]');
+        if (deleteInput != undefined) {
+            deleteInput.checked = false;
+        }
+        resetPositionNumbers()
+    }
     
     function testCaseParametersBeautify(){
-        console.log('Beautify');
         const parametersTextArea = document.getElementById("testCaseParameters");
         const json = JSON.parse(parametersTextArea.value);
-        console.log(json);
         parametersTextArea.value = JSON.stringify(json, undefined, 2)
     }
 
     function markForDeleting(elem){
         const testStepId = elem.getAttribute('teststep-id');
-        console.log(testStepId);
         const deleteInput = document.querySelector('input[name$=' + 'form-' + testStepId + '-DELETE');
-        console.log(deleteInput);
         deleteInput.checked = true;
+        const testStepContainer = document.querySelector('ul[id=testStep' + testStepId + ']')
+        testStepContainer.classList.add('hide')
+        resetPositionNumbers()
+        showToast(testStepContainer)
+    }
+
+    function markForDeletingNotInBd(elem){
+        const testStepId = elem.getAttribute('teststep-id');
+        const testStepContainer = document.querySelector('ul[id=testStep' + testStepId + ']')
+        testStepContainer.classList.add('hide')
+        resetPositionNumbers()
+        showToast(testStepContainer)
     }
     
 
     const totalForm = document.getElementById('id_form-TOTAL_FORMS')
     const stepList = document.getElementById('stepsList');
     const step = document.querySelector('#forCopy');
-    step.classList.add('hide');
 
     function resetPositionNumbers(){
-        const positionsArray = stepList.querySelectorAll('input[name$=position]');
-        const counterArray = stepList.querySelectorAll('li[class$=col-teststep-counter]')
-        console.log(positionsArray)
-        console.log(counterArray)
-        for(i=0; i<counterArray.length; i++) {
-            console.log('updating')
+        const testStepContainer = document.querySelectorAll('ul[id^=testStep]:not(.hide)')
+        const counterArray = []
+        const positionsArray = []
+        testStepContainer.forEach((elem) => {
+            counterArray.push(elem.querySelector('li'))
+            positionsArray.push(elem.querySelector('input[name$=position]'))
+        })
+        for(let i=0; i<counterArray.length; i++) {
             positionsArray[i].value = i;
             counterArray[i].innerHTML = i+1;
         }
     }
+
+    // function resetPositionNumbers(){
+    //     const positionsArray = stepList.querySelectorAll('input[name$=position]');
+    //     const counterArray = stepList.querySelectorAll('li[class$=col-teststep-counter]')
+    //     console.log(testStepContainer)
+    //     // console.log(counterArray)
+    //     for(i=0; i<counterArray.length; i++) {
+    //         console.log('updating')
+    //         positionsArray[i].value = i;
+    //         counterArray[i].innerHTML = i+1;
+    //     }
+    // }
     
     const list = document.getElementById('stepsList');
     let draggingElement = null;
@@ -213,10 +321,24 @@
         let totalForms = totalForm.value;
         let addStep = step.cloneNode(true);
         addStep.classList.remove('hide')
+        addStep.id = 'testStep' + totalForms
         let action = addStep.querySelector('textarea:first-of-type')
         let expected_result = addStep.querySelector('textarea:last-of-type')
-        let position = addStep.querySelector('input:first-of-type')
-        let id = addStep.querySelector('input:last-of-type')
+        // let position = addStep.querySelector('input:first-of-type')
+        // let id = addStep.querySelector('input:last-of-type')
+        let position = addStep.querySelectorAll('input')[0];
+        let id = addStep.querySelectorAll('input')[1];
+        let deleteInput = addStep.querySelectorAll('input')[2];
+
+        let dropdown = addStep.querySelector('div')
+        let aInDropdown = dropdown.querySelector('a[data-bs-toggle]')
+        let ulInDropdown = dropdown.querySelector('ul')
+        let deleteInDropdown = dropdown.querySelector('a[teststep-id]')
+
+        aInDropdown.id = 'testStepActions' + totalForms
+        ulInDropdown.setAttribute('aria-labelledby', 'testStepActions' + totalForms)
+
+        deleteInDropdown.setAttribute('teststep-id', totalForms)
 
         action.name = 'form-' + totalForms + '-action'
         action.id = 'id_form-' + totalForms + '-action'
@@ -226,8 +348,13 @@
         position.id = 'id_form-' + totalForms + '-position' 
         id.name = 'form-' + totalForms + '-id'
         id.id = 'id_form-' + totalForms + '-id'
+        deleteInput.name = 'form-' + totalForms + '-DELETE'
+        deleteInput.id = 'id_form-' + totalForms + '-DELETE'
 
         stepList.append(addStep);
+        deleteInDropdown.addEventListener('click', function(event) {
+            markForDeletingNotInBd(event.target)
+        })
         resetPositionNumbers();
 
         totalForms++;

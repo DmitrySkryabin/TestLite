@@ -83,7 +83,7 @@ class TestCase(models.Model):
     author = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
 
     def __str__(self):
-        return f'{self.name}'
+        return f'{self.key}:{self.name}'
     
     def save(self, *args, **kwargs):
         if not self.pk:
@@ -107,7 +107,7 @@ class TestCase(models.Model):
 class TestCaseFolder(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
     name = models.CharField(max_length=200)
-    test_cases = models.ManyToManyField(TestCase)
+    test_cases = models.ManyToManyField(TestCase, blank=True)
 
     def __str__(self):
         return f'{self.name}'
