@@ -1,18 +1,65 @@
 {% extends 'main.html' %}
 
 {% block content %}
-<form action="" method="post">
+<form action="" method="post" class="h-100 testcase-form">
     {% csrf_token %}
-    <div class="form-con">
-        <div class="left">
-            {{ form.name }}
-            {{ form.description }}
-            {{ form.test_cases }}
-            </table>
-        </div>
-        <div class="right">
-            <button type="submit" class="green-btn btn">Сохранить</button>
+    <div class="container-fluid h-100">
+        <div class="row h-100">
+            <div class="col-auto pt-2 border-end">
+                <a href="{% url 'TMS:testcases' request.resolver_match.kwargs.project %}" class="btn btn-warning">
+                    <i class="bi bi-arrow-left"></i></a>
+            </div>
+            <div class="col h-100">
+                <div class="row h-6dot4 border-bottom">
+                    <div class="container pb-2 pt-2">
+                        <div class="row">
+                            <div class="col-1 d-flex align-items-center">
+                                <h5>{{ object.key }}</h5>
+                            </div>
+                            <div class="col-9 d-flex align-items-center">
+                                {{ form.name }}
+                            </div>
+                            <div class="col-md-2 d-flex justify-content-between align-items-center">
+                                <button type="submit" class="btn btn-success">Сохранить</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row h-93dot6">
+                    <div class="col-md-1 border-end pb-2 pt-2">
+                        <div class="nav flex-column nav-pills me-3" id="v-pills-tab" role="tablist"
+                            aria-orientation="vertical">
+                            <button class="nav-link active d-flex mb-1" id="teststeps-tab" data-bs-toggle="pill"
+                                data-bs-target="#teststeps" type="button" role="tab" aria-controls="teststeps"
+                                aria-selected="true">Тест кейсы</button>
+                            <button class="nav-link d-flex mb-1" id="description-tab" data-bs-toggle="pill"
+                                data-bs-target="#description" type="button" role="tab" aria-controls="description"
+                                aria-selected="false">Описание</button>
+                        </div>
+                    </div>
+                    <div class="col-md-8 border-end pb-2 not-padd h-100 overflow-auto">
+                        <div class="tab-content pt-2 h-100" id="v-pills-tabContent">
+                            <div class="tab-pane fade show active" id="teststeps" role="tabpanel"
+                                aria-labelledby="teststeps">
+                                <div class="container testcase-collapse-content">
+                                    {{ form.test_cases }}
+                                </div>
+                            </div>
+                            <div class="tab-pane fade h-100" id="description" role="tabpanel" aria-labelledby="description">
+                                <div class="container h-100">
+                                    {{ form.description }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 pb-2 pt-2 h-100 overflow-auto">
+                        <div class="container">
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-</form>    
+</form>
+  
 {% endblock %}

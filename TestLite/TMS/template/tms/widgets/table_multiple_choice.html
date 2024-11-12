@@ -12,7 +12,7 @@
   <tbody>
     {% for testcase in testcases %}
       <tr onclick="checkUncheckCheckbox(this)" class="table-row-clickable">
-        <td><input type="checkbox" name="test_cases" value="{{ testcase.pk }}" id="id_test_cases_{{ forloop.counter0 }}" onclick="this.click()"></td>
+        <td><input type="checkbox" name="test_cases" value="{{ testcase.pk }}" id="id_test_cases_{{ forloop.counter0 }}" onclick="this.click()" {% if testcase.selected %} checked {% endif %}></td>
         <td>{{ testcase.key }}</td>
         <td>{{ testcase.name }}</td>
         <td>{{ testcase.version }}</td>

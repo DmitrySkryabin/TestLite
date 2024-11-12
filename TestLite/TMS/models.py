@@ -131,10 +131,11 @@ class TestStep(BaseTestStep):
 class TestSuite(models.Model):
     '''Тестовый суит с тест кейсами'''
     name = models.CharField(max_length=200)
-    key = models.CharField(max_length=200)
+    key = models.CharField(max_length=200, blank=True)
     description = models.TextField()
 
     test_cases = models.ManyToManyField(TestCase)
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
 
     def __str__(self):
         return f'{self.name}'

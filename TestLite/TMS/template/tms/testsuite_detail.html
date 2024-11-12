@@ -1,57 +1,155 @@
 {% extends 'main.html' %}
 
 {% block content %}
-
-    <div class="form-con">
-        <div class="left">
-            <h3>{{ object.name }}</h3>
-            {{ object.description }}
-            <table>
-                <thead>
-                    <tr>
-                        <td>Номер</td>
-                        <td>Тесткейс</td>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for testcase in object.test_cases.all %}
-                    <tr>
-                        <td>{{ forloop.counter }}</td>
-                        <td><a href="{% url 'TMS:testcase_detail' request.resolver_match.kwargs.project testcase.id %}">{{ testcase.name }}</a></td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-            <h4>Прогоны тест суита</h4>
-            <table>
-                <thead>
-                    <tr>
-                        <td>Номер</td>
-                        <td>Прогон</td>
-                        <td>Дата прогона</td>
-                        <td>Тип</td>
-                        <td>Статус</td>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for testsuiterun in testsuiteruns %}
-                        <tr>
-                            <td>{{ forloop.counter }}</td>
-                            <td><a href="{% url 'TMS:testsuiterun_detail' request.resolver_match.kwargs.project object.id testsuiterun.pk %}">{{ testsuiterun }}</a></td>
-                            <td>{{ testsuiterun.date_time }}</td>
-                            <td><span class="status {{ testsuiterun.type }}">{{ testsuiterun.get_type_display }}</span></td>
-                            <td><span class="status {{ testsuiterun.status }}">{{ testsuiterun.get_status_display }}</span></td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+<div class="container-fluid h-100">
+    <div class="row h-100">
+        <div class="col-auto pt-2 border-end">
+            <a href="{% url 'TMS:testcases' request.resolver_match.kwargs.project %}" class="btn btn-warning">
+                <i class="bi bi-arrow-left"></i></a>
         </div>
-        <div class="right">
-            <a href="{% url 'TMS:testsuite_update' request.resolver_match.kwargs.project object.id %}"><button class="green-btn btn">Редактировать</button></a>
-            <a href="{% url 'TMS:testsuite_execute_v1' request.resolver_match.kwargs.project object.id %}"><button class="blue-btn btn">Выполнить V1</button></a>
-            <a href="{% url 'TMS:testsuite_execute_v2' request.resolver_match.kwargs.project object.id %}"><button class="blue-btn btn">Выполнить V2</button></a>
-            <a href="{% url 'TMS:testsuite_execute_v3' request.resolver_match.kwargs.project object.id %}"><button class="blue-btn btn">Выполнить V3</button></a>
+        <div class="col h-100">
+            <div class="row h-6dot4 border-bottom">
+                <div class="container pb-2 pt-2">
+                    <div class="row">
+                        <div class="col-1 d-flex align-items-center">
+                            <h5>{{ object.key }}</h5>
+                        </div>
+                        <div class="col-9 d-flex align-items-center">
+                            <h5>{{ object.name }}</h5>
+                        </div>
+                        <div class="col-md-2 d-flex justify-content-between align-items-center">
+                            <a href="{% url 'TMS:testsuite_update' request.resolver_match.kwargs.project object.id %}"
+                                class="btn btn-warning">Редактировать</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row h-93dot6">
+                <div class="col-md-1 border-end pb-2 pt-2">
+                    <div class="nav flex-column nav-pills me-3" id="v-pills-tab" role="tablist"
+                        aria-orientation="vertical">
+                        <button class="nav-link active d-flex mb-1" id="testcases-tab" data-bs-toggle="pill"
+                            data-bs-target="#testcases" type="button" role="tab" aria-controls="testcases"
+                            aria-selected="true">Тест кейсы</button>
+                        <button class="nav-link d-flex mb-1" id="other-tab" data-bs-toggle="pill"
+                            data-bs-target="#other" type="button" role="tab" aria-controls="other"
+                            aria-selected="false">Запуски</button>
+                        <button class="nav-link d-flex mb-1" id="description-tab" data-bs-toggle="pill"
+                            data-bs-target="#description" type="button" role="tab" aria-controls="description"
+                            aria-selected="false">Описание</button>
+                    </div>
+                </div>
+                <div class="col-md-8 border-end pb-2 not-padd h-100 overflow-auto">
+                    <div class="tab-content pt-2 h-100" id="v-pills-tabContent">
+                        <div class="tab-pane fade show active h-100" id="testcases" role="tabpanel"
+                            aria-labelledby="testcases">
+                            <div class="container h-100">
+                                <div class="table-container border rounded-top h-100">
+                                    <table class="table table-sm">
+                                        <thead class="thead-light">
+                                            <tr>
+                                                <th scope="col">Ключ</th>
+                                                <th scope="col">Название</th>
+                                                <th scope="col">Версия</th>
+                                                <th scope="col">Приоритет</th>
+                                                <th scope="col">Статус</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for testcase in object.test_cases.all %}
+                                            <tr>
+                                                <td>{{ testcase.key }}</td>
+                                                <td>{{ testcase.name }}</td>
+                                                <td>{{ testcase.version }}</td>
+                                                <td><span class="badge {{ testcase.priority|priority_bootstrap_class }}">{{ testcase.get_priority_display }}</span></td>
+                                                <td>{% if testcase.testcaserun_set.last.status %}<span class="badge {{ testcase.testcaserun_set.last.status|status_bootstrap_class }}">{{ testcase.testcaserun_set.last.get_status_display }}</span>{% endif %}</td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade h-100" id="other" role="tabpanel" aria-labelledby="other">
+                            <div class="container h-100">
+                                <div class="table-container border rounded-top h-100">
+                                    <table class="table table-sm">
+                                        <thead class="thead-light">
+                                            <tr>
+                                                <th scope="col">#</th>
+                                                <th scope="col">Дата</th>
+                                                <th scope="col">Тип</th>
+                                                <th scope="col">Статус</th>
+                                                <th scope="col">Результаты Тест суит</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for testsuiterun in testsuiteruns%}
+                                            <tr>
+                                                <td>{{ forloop.counter }}</td>
+                                                <td>{{ testsuiterun.date_time|date:"d.m.Y в H:i" }}</td>
+                                                <td><span class="badge {{ testsuiterun.type|type_bootstrap_class }}">{{ testsuiterun.get_type_display }}</span></td>
+                                                <td><span class="badge {{ testsuiterun.status|status_bootstrap_class }}">{{ testsuiterun.get_status_display }}</span></td>
+                                                <td><a href="{% url 'TMS:testsuiterun_detail' request.resolver_match.kwargs.project object.pk testsuiterun.pk %}">Результаты</a></td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade h-100" id="parameters" role="tabpanel" aria-labelledby="parameters">
+                            <div class="container h-100">
+                                <input id="parameters-pre-value" type="hidden" value="{{ testcase_parameters_as_text }}">
+                                <pre class="form-control h-100" id="parameters-pre"></pre>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade h-100" id="description" role="tabpanel" aria-labelledby="description">
+                            <div class="container h-100">
+                                <textarea name="" id="" class="form-control h-100" readonly>{{ object.description }}</textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 pb-2 pt-2 h-100 overflow-auto">
+                    <!-- <div class="container"> -->
+                        <div class="row">
+                            <h6>Ручное выполнение</h6>
+                        </div>
+                        <div class="row mb-2">
+                            <label for="testCaseExecuteV1" class="col-6 col-form-label">Не стабильно</label>
+                            <div class="col-6 d-grid">
+                                <a href="{% url 'TMS:testsuite_execute_v1' request.resolver_match.kwargs.project object.id %}" id="testCaseExecuteV1" class="btn btn-secondary">Выполнить (v1)</a>
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <label for="testCaseExecuteV2" class="col-6 col-form-label">Относительно стабильно</label>
+                            <div class="col-6 d-grid">
+                                <a href="{% url 'TMS:testsuite_execute_v2' request.resolver_match.kwargs.project object.id %}" id="testCaseExecuteV2" class="btn btn-warning">Выполнить (v2)</a>
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <label for="testCaseExecuteV3" class="col-6 col-form-label">Относительно стабильно</label>
+                            <div class="col-6 d-grid">
+                                <a href="{% url 'TMS:testsuite_execute_v3' request.resolver_match.kwargs.project object.id %}" id="testCaseExecuteV3" class="btn btn-warning">Выполнить (v3)</a>
+                            </div>
+                        </div>
+                        <div class="row mb-2 border-bottom">
+                            
+                        </div>
+                        <div class="row">
+                            <h6>Автоматическое выполнение</h6>
+                        </div>
+                        <div class="row mb-2 ">
+                            <label for="testCaseExecuteV3" class="col-6 col-form-label">Пайлайн</label>
+                            <div class="col-6 d-grid">
+                                <a href="{% url 'TMS:testsuite_execute_v3' request.resolver_match.kwargs.project object.id %}" id="testCaseExecuteV3" class="btn btn-primary">Выполнить</a>
+                            </div>
+                        </div>
+                    <!-- </div> -->
+                </div>
+            </div>
         </div>
     </div>
-</form>
+</div>
 {% endblock %}

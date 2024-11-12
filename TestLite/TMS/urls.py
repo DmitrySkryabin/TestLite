@@ -12,6 +12,7 @@ urlpatterns = [
     path('<slug:project>/testcase/<int:pk>/update', views.TestCaseUpdateView.as_view(), name='testcase_update'),
     path('<slug:project>/testsuites', views.TestSuiteListView.as_view(), name='testsuites'),
     path('<slug:project>/testsuite/<int:pk>', views.TestSuiteDetailView.as_view(), name='testsuite_detail'),
+    path('<slug:project>/testsuite/create', views.TestSuiteCreateView.as_view(), name='testsuite_create'),
     path('<slug:project>/testsuite/<int:pk>/update', views.TestSuiteUpdateView.as_view(), name='testsuite_update'),
     path('<slug:project>/testsuite/<int:pk>/execute/v1', views.TestSuiteExecuteV1.as_view(), name='testsuite_execute_v1'),
     path('<slug:project>/testsuite/<int:pk>/execute/v2', views.TestSuiteExecuteV2.as_view(), name='testsuite_execute_v2'),

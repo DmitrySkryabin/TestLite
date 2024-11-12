@@ -32,8 +32,19 @@ class TableModelMultipleChoiceField(forms.CheckboxSelectMultiple):
 
     def get_context(self, *args, **kwargs):
         context = super().get_context(*args, **kwargs)
-        context['testcases'] = [item[0].instance for item in self.choices]
+
+        def add_selected_attr(testcase):
+            # Добавялем новый атрибут, если у нас выбран данный тест кейс
+            setattr(testcase, 'selected', True)
+            return testcase
+        
+        if args[1] is None:
+            context['testcases'] = [item[0].instance for item in self.choices]
+        else:
+            context['testcases'] = [item[0].instance if item[0].instance.id not in args[1] else add_selected_attr(item[0].instance) for item in self.choices]
+        
         return context
+
 
 
 class TestCaseFolderForm(forms.ModelForm):
@@ -84,8 +95,8 @@ class TestCaseFormset(forms.BaseModelFormSet):
 
     def add_fields(self, form, index):
         super().add_fields(form, index)
-        # if 'DELETE' in form.fields:
-        #     form.fields['DELETE'].widget = forms.HiddenInput()
+        if 'DELETE' in form.fields:
+            form.fields['DELETE'].widget.attrs.update({'class': 'hide'})
 
 
 
@@ -127,6 +138,23 @@ class TestSuiteForm(forms.ModelForm):
             'description',
             'test_cases'
         ]
+
+    def __init__(self, project=None, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        if project is None:
+            queryset = TestCase.objects.filter(project=kwargs.get('instance').project)
+        else:
+            queryset = TestCase.objects.filter(project=Project.objects.get(key=project))
+        
+        self.fields['name'].widget.attrs.update({'class': 'form-control'})
+        self.fields['description'].widget.attrs.update({'class': 'form-control'})
+        self.fields['test_cases'] = forms.ModelMultipleChoiceField(
+            queryset=queryset,
+            widget=TableModelMultipleChoiceField,
+            required=True
+        )
+
 
 
 class TestStepRunFormset(forms.BaseModelFormSet):

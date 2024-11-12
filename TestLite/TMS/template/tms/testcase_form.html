@@ -62,8 +62,8 @@
                                                 <li class="list-group-item bg-secondary text-light col-teststep-counter"></li>
                                                 <textarea name="" cols="1" rows="1" onkeyup="textAreaAdjust(this)" class=" list-group-item col" id=""></textarea>
                                                 <input type="hidden" name="" value="0" id="">
-                                                <input type="hidden" name="" value="" id="">
-                                                <input type="hidden" name="" value="" id="">
+                                                <input type="hidden" name="" id="">
+                                                <input type="checkbox" name="" id="" class="hide">
                                                 <div class="dropdown">
                                                     <a class="btn btn-secondary btn-sm" href="#" role="button" id="" data-bs-toggle="dropdown" aria-expanded="false">
                                                         <i class="bi bi-three-dots"></i>
@@ -82,7 +82,7 @@
                                                         {{ teststep.action }}
                                                         {{ teststep.position.as_hidden }}
                                                         {{ teststep.id }}
-                                                        {{ teststep.DELETE }}
+                                                        {{ teststep.DELETE}}
                                                         <div class="dropdown">
                                                             <a class="btn btn-secondary btn-sm" href="#" role="button" id="testStepActions{{ forloop.counter0 }}" data-bs-toggle="dropdown" aria-expanded="false">
                                                                 <i class="bi bi-three-dots"></i>
@@ -353,7 +353,7 @@
 
         stepList.append(addStep);
         deleteInDropdown.addEventListener('click', function(event) {
-            markForDeletingNotInBd(event.target)
+            markForDeleting(event.target)
         })
         resetPositionNumbers();
 

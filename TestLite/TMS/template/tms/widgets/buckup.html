@@ -6,6 +6,7 @@
             <label>{{ group }}</label>
         {% endif %}
         {% for option in options %}
+        {{ options }}
           <div>
             {% include option.template_name with widget=option %}
           </div>

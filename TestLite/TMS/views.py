@@ -122,11 +122,9 @@ class TestCaseUpdateView(UpdateView):
         if context['testcase_step_formset'].is_valid():
             testcase = form.save()
             for teststep in context['testcase_step_formset'].save(commit=False):
-                print(teststep)
                 teststep.test_case = testcase
                 teststep.save()
             for teststep in context['testcase_step_formset'].deleted_objects:
-                print(teststep)
                 teststep.delete()
         else:
             print(context['testcase_step_formset'].errors)
@@ -173,6 +171,9 @@ class TestCaseCreateView(CreateView):
 class TestSuiteListView(ListView):
     model = TestSuite
 
+    def get_queryset(self):
+        return TestSuite.objects.filter(project__key=self.kwargs.get('project'))
+
 
 
 class TestSuiteDetailView(DetailView):
@@ -182,6 +183,29 @@ class TestSuiteDetailView(DetailView):
         context = super().get_context_data(**kwargs)
         context['testsuiteruns'] = TestSuiteRun.objects.filter(test_suite=self.object).order_by('-date_time')
         return context
+    
+
+
+class TestSuiteCreateView(CreateView):
+    model = TestSuite
+    form_class = TestSuiteForm
+
+    def get_form(self, form_class = TestSuiteForm):
+        return TestSuiteForm(project=self.kwargs.get('project'))
+    
+    def post(self, request, *args, **kwargs):
+        '''Что-то тут отказывается норма работать form_valid form_invalid'''
+        form = TestSuiteForm(kwargs.get('project'), request.POST)
+        if form.is_valid():
+            testsuite: TestSuite = form.save(commit=False)
+            testsuite.project = Project.objects.get(key=kwargs.get('project'))
+            testsuite.save()
+            for testcase in form.cleaned_data.get('test_cases'):
+                testsuite.test_cases.add(testcase)
+            return redirect(reverse('TMS:testsuite_detail', kwargs={'project':f'{testsuite.project.key}', 'pk': testsuite.pk}))
+        else:
+            self.form_invalid(form)
+        return super().post(request, *args, **kwargs)
 
 
 
@@ -191,7 +215,7 @@ class TestSuiteUpdateView(UpdateView):
 
     def form_valid(self, form: BaseModelForm) -> HttpResponse:
         testsuite = form.save()
-        return redirect(reverse('TMS:testsuite_detail', kwargs={'project':f'{testsuite.test_cases.first().project.key}', 'pk': testsuite.pk}))
+        return redirect(reverse('TMS:testsuite_detail', kwargs={'project':f'{testsuite.project.key}', 'pk': testsuite.pk}))
     
 
 
