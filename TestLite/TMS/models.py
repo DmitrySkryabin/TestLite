@@ -170,6 +170,7 @@ class TestCaseRun(models.Model):
     start_time = models.DateTimeField()
     stop_time = models.DateTimeField()
     duration = models.FloatField()
+    duration_as_django_duration = models.DurationField(null=True, blank=True)
     type = models.CharField(choices=TYPE, max_length=20) # Тип запуска 
     status = models.CharField(choices=STATUS, max_length=50)
     precondition_status = models.CharField(choices=STATUS, max_length=50, null=True, blank=True)

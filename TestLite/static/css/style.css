@@ -4,6 +4,8 @@ body{
 
 :root{
     --header-height: 6.4%;
+    --bg-warning-light: #fff3cd;
+    --bg-error-light: #ffe7e6;
 }
 
 .h-6dot4{
@@ -91,4 +93,35 @@ body{
     right: 0;
     top: 0;
     margin: 5px 5px;
+}
+
+/* .testcaserun-list{
+    border: var(--bs-warning) !important;
+} */
+
+.testcaserun-list li:hover{
+    background: #fff3cd !important;
+}
+
+.testcaserun-list .active{
+    background: var(--bs-warning) !important;
+    color: black !important;
+    border: none;
+}
+.textarea-in-teststep{
+    width: 100%;
+    border: none;
+}
+.testsuiterun_step{
+    height: 45px;
+    overflow: hidden;
+    resize: vertical;
+}
+
+.bg-warning-light{
+    background: var(--bg-warning-light);
+}
+
+.bg-error-light{
+    background: var(--bg-error-light);
 }
