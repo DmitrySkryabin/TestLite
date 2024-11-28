@@ -44,7 +44,7 @@ def priority_bootstrap_class(value):
     
 @register.filter(is_save=True)
 def status_bootstrap_icon_class(value):
-    if value == 'S':
+    if value == 'S' or 'None' or None:
         element = '<i class="bi bi-dash-circle-fill text-secondary h4" title="Пропущено"></i>'
     if value == 'P':
         element = '<i class="bi bi-check-circle-fill text-success h4" title="Успешно"></i>'
@@ -52,7 +52,7 @@ def status_bootstrap_icon_class(value):
         element = '<i class="bi bi-exclamation-circle-fill text-warning h4" title="Ошибка"></i>'
     if value == 'F':
         element = '<i class="bi bi-x-circle-fill text-danger h4" title="Провал"></i>'
-    
+
     return mark_safe(element)
 
 @register.filter(is_save=True)

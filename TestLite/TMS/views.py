@@ -408,6 +408,14 @@ class TestSuiteExecuteV3(TemplateView):
     
 
 
+class TestRunsListView(ListView):
+
+    def get_queryset(self):
+        print(self.kwargs)
+        return TestSuiteRun.objects.filter(test_suite__project__key=self.kwargs.get('project')).order_by('-date_time')
+
+
+
 class TestSuiteRunDetailView(DetailView):
     model = TestSuiteRun
 
@@ -415,6 +423,7 @@ class TestSuiteRunDetailView(DetailView):
         context = super().get_context_data(**kwargs)
         context['testcaseruns'] = TestCaseRun.objects.filter(test_suite_run=self.object)
         return context
+    
     
 
 class API:
@@ -428,6 +437,7 @@ class APIv1(API):
     def save_testsuite(request, *args, **kwargs):
         testsuite_key = kwargs.get('testsuite')
         data = json.loads(request.body)
+        print(data)
         TestSuiteSaveHelper.save_test_suite_run(testsuite_key, data)
 
         return HttpResponse('LOL')

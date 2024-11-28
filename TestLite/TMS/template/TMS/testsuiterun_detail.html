@@ -1,0 +1,125 @@
+{% extends 'main.html' %}
+
+{% block content %}
+
+<div class="container-fluid h-100">
+    <div class="row h-100">
+        <div class="col-auto pt-2 border-end">
+            <a href="{% url 'TMS:testcases' request.resolver_match.kwargs.project %}" class="btn btn-warning">
+                <i class="bi bi-arrow-left"></i></a>
+        </div>
+        <div class="col h-100">
+            <div class="row h-6dot4 border-bottom">
+                <div class="container pb-2 pt-2">
+                    <div class="row">
+                        <div class="col d-flex align-items-center">
+                            <h5><span class="ms-1 me-2">{{ object.status|status_bootstrap_icon_class }}</span> <span class="me-2">{{ object.type|type_bootstrap_icon_class }}</span> Прогон "{{ object.test_suite.name }}" от {{ object.date_time|date:"d.m.Y в H:i" }}</h5>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row h-93dot6">
+                <div class="can-resizeble">
+                    <div class="resizeble-col border-end p-0 overflow-auto ">
+                        <ul class="list-group list-group-flush list-group-sm testcaserun-list">
+                        {% for testcaserun in testcaseruns %}
+                            <li role="tab" type="button" class="list-group-item p-1 d-flex justify-content-between" data-bs-toggle="tab" data-bs-target="#TestCaseRun{{ testcaserun.id }}" aria-controls="TestCaseRun{{ testcaserun.id }}"><div class="d-flex"><div class="col-auto"><span class="me-2">{{ testcaserun.status|status_bootstrap_icon_class }}</span></div><div>{{ testcaserun.test_case.name }}</div></div><div>{{ testcaserun.duration }}</div></li> 
+                        {% endfor %}
+                        </ul>
+                    </div>
+                    <div class="resizeble-col p-0 h-100 overflow-auto">
+                        <div class="tab-content" id="v-pills-tabContent">
+                            {% for testcaserun in testcaseruns %}
+                            <div class="tab-pane fade" id="TestCaseRun{{ testcaserun.id }}" role="tabpanel" aria-labelledby="TestCaseRun{{ testcaserun.id }}">
+                                <div class="nav nav-tabs mb-3" id="nav-tab" role="tablist">
+                                    <button class="nav-link active" id="nav-teststeps-tab" data-bs-toggle="tab" data-bs-target="#nav-teststeps{{ testcaserun.id }}" type="button" role="tab" aria-controls="nav-teststeps{{ testcaserun.id }}" aria-selected="true">Шаги теста</button>
+                                    {% if testcaserun.log %}<button class="nav-link" id="nav-logs-tab" data-bs-toggle="tab" data-bs-target="#nav-logs{{ testcaserun.id }}" type="button" role="tab" aria-controls="nav-logs{{ testcaserun.id }}" aria-selected="false">Логи</button>{% endif %}
+                                </div>
+                                <div class="tab-content h-100" id="nav-tabContent">
+                                    <div class="tab-pane fade active show" id="nav-teststeps{{ testcaserun.id }}" role="tabpanel" aria-labelledby="nav-teststeps-tab">
+                                        <div class="mt-2 mb-2">
+                                            {% if testcaserun.report %}
+                                            <div class="container pt-2 {% if testcaserun.status == 'E' %} bg-warning-light {% endif %} {% if testcaserun.status == 'F' %} bg-error-light {% endif %}">
+                                                {% if testcaserun.status == 'E' %}
+                                                    <pre>{{ testcaserun.report }}</pre>
+                                                {% endif %}
+                                                {% if testcaserun.status == 'F' %}
+                                                    <h5>FAIL</h5>
+                                                    <pre>{{ testcaserun.report }}</pre>
+                                                {% endif %}
+                                            </div>
+                                            {% endif %}
+                                            {% if testcaserun.skipreason %}
+                                            <div class="container pt-2 bg-light">
+                                                <h5>SKIPREASON</h5>
+                                                <pre>{{ testcaserun.skipreason }}</pre>
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="container">
+                                            <div class="row mb-2">
+                                                <div class="d-flex align-items-center">
+                                                    <span class="me-2">{{ testcaserun.precondition_status|status_bootstrap_icon_class }}</span>
+                                                    <input type="text" placeholder="Предусловия" class="form-control" value="{{ testcaserun.test_case.preconditions }}" readonly>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                {% for teststep in testcaserun.get_test_steps %}
+                                                <div class="d-flex align-items-center">
+                                                    <span class="me-2">{{ teststep.result|status_bootstrap_icon_class }}</span>
+                                                    <ul class="list-group list-group-horizontal mb-1 testsuiterun_step w-100">
+                                                        <li class="list-group-item bg-secondary text-light col-teststep-counter">{{ forloop.counter }}</li>
+                                                        <li class="list-group-item col {{ teststep.result|status_bootstrap_background_class_for_teststep }}">{{ teststep.action }}</li>
+                                                        <li class="list-group-item col {{ teststep.result|status_bootstrap_background_class_for_teststep }}">{{ teststep.expected_result }}</li>
+                                                    </ul>
+                                                </div>
+                                                {% endfor %}
+                                            </div>
+                                            <div class="row mt-1">
+                                                <div class="d-flex align-items-center">
+                                                    <span class="me-2">{{ testcaserun.postcondition_status|status_bootstrap_icon_class }}</span>
+                                                    <input type="text" placeholder="Постусловия" class="form-control" value="{{ testcaserun.test_case.postconditions }}" readonly>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="tab-pane fade" id="nav-logs{{ testcaserun.id }}" role="tabpanel" aria-labelledby="nav-logs-tab">
+                                        <div class="container">
+                                            <pre>{{ testcaserun.log }}</pre>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- <h3>{{ object.test_suite.name }} {{ object.date_time }}</h3>
+<div class="form-con">
+    <div class="left">
+        {% for testcaserun in testcaseruns %}
+        <h4>{{ testcaserun.test_case.name }} <span class="status {{ testcaserun.status }}">{{testcaserun.get_status_display }}</span></h4>
+        <table>
+            <tbody>
+                {% for teststep in testcaserun.get_test_steps %}
+                <tr>
+                    <td style="width: 45%; border: 1px solid black;">{{ teststep.action }}</td>
+                    <td style="width: 50%; border: 1px solid black;">{{ teststep.expected_result }}</td>
+                    <td style="width: 5%; border: 1px solid black;"><span class="status {{ teststep.result }}">{{
+                            teststep.get_result_display }}</span></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% endfor %}
+    </div>
+    <div class="right">
+
+    </div>
+</div> -->
+{% endblock %}

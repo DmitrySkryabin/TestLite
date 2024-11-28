@@ -18,6 +18,7 @@ urlpatterns = [
     path('<slug:project>/testsuite/<int:pk>/execute/v2', views.TestSuiteExecuteV2.as_view(), name='testsuite_execute_v2'),
     path('<slug:project>/testsuite/<int:pk>/execute/v3', views.TestSuiteExecuteV3.as_view(), name='testsuite_execute_v3'),
     path('<slug:project>/testsuite/<int:testsuite_pk>/run/<int:pk>', views.TestSuiteRunDetailView.as_view(), name='testsuiterun_detail'),
+    path('<slug:project>/runs', views.TestRunsListView.as_view(), name='runs'),
 
     # TestSuiteExecuteV2 доп запросы
     path('<slug:project>/testsuite/<int:pk>/execute/v2/<int:testsuiterun_pk>', views.TestSuiteExecuteV2.as_view(), name='testsuite_execute_v2'),

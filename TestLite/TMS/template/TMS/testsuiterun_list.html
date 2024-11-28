@@ -1,0 +1,36 @@
+{% extends 'main.html' %}
+
+{% block content %}
+<div class="container-fluid h-100">
+    <div class="row h-100">
+        <div class="container pt-2">
+            <div class="table-container border rounded-top h-100">
+                <table class="table table-sm">
+                    <thead class="thead-light">
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Тест суит</th>
+                            <th scope="col">Дата</th>
+                            <th scope="col">Тип</th>
+                            <th scope="col">Статус</th>
+                            <th scope="col">Результаты Тест суит</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for testsuiterun in object_list%}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td><a href="{% url 'TMS:testsuite_detail' request.resolver_match.kwargs.project testsuiterun.test_suite.pk %}">{{ testsuiterun.test_suite }}</a></td>
+                            <td>{{ testsuiterun.date_time|date:"d.m.Y в H:i" }}</td>
+                            <td><span class="badge {{ testsuiterun.type|type_bootstrap_class }}">{{ testsuiterun.get_type_display }}</span></td>
+                            <td><span class="badge {{ testsuiterun.status|status_bootstrap_class }}">{{ testsuiterun.get_status_display }}</span></td>
+                            <td><a href="{% url 'TMS:testsuiterun_detail' request.resolver_match.kwargs.project testsuiterun.test_suite.pk testsuiterun.pk %}">Результаты</a></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
