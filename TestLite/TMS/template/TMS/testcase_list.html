@@ -128,7 +128,7 @@
     {% if messages %}
         {% for message in messages %}
             <div class="toast" role="alert" aria-live="assertive" aria-atomic="true">
-                <div class="toast-header {% if message.tags == 'error' %} bg-danger text-light {% endif %}{% if message.tags == 'info' %} bg-warning {% endif %}">
+                <div class="toast-header {% if message.tags == 'error' %} bg-danger text-light {% endif %}{% if message.tags == 'info' %} bg-warningутм {% endif %}">
                 {% if message.tags == 'error' %}<strong class="me-auto">Ошибка</strong>{% endif %}
                 {% if message.tags == 'info' %}<strong class="me-auto">Успешно</strong>{% endif %}
                 <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>

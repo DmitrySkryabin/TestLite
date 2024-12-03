@@ -469,6 +469,7 @@ class AutotestSettingsCreateView(CreateView):
     model = AutotestSettings
     
     
+    
 
 class API:
 
