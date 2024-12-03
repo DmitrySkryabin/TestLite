@@ -4,7 +4,7 @@ from typing import Any
 from django import forms
 from django.forms.renderers import BaseRenderer
 from django.utils.safestring import SafeText
-from .models import Project, TestStep, TestCase, TestCaseFolder, TestSuite, TestSuiteRun, TestCaseRun, TestStepRun
+from .models import Project, TestStep, TestCase, TestCaseFolder, TestSuite, TestSuiteRun, TestCaseRun, TestStepRun, AutotestSetting, AutotestSettingParam
 
 
 class ProjectForm(forms.ModelForm):
@@ -60,7 +60,7 @@ class TestCaseFolderForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['name'].widget.attrs.update({'class': 'form-control', 'id': 'folderName'})
         self.fields['test_cases'] = forms.ModelMultipleChoiceField(
-            queryset=TestCase.objects.filter(project=project),
+            queryset=TestCase.objects.filter(project=project, archived=False),
             widget=TableModelMultipleChoiceField,
             required=False
         )
@@ -202,4 +202,31 @@ class TestStepRunForm(forms.ModelForm):
             self.fields['expected_result'].widget.attrs.update({'rows': '1'})
         self.fields['action'].widget.attrs.update({'onkeyup': 'textAreaAdjust(this)'})
         self.fields['expected_result'].widget.attrs.update({'onkeyup': 'textAreaAdjust(this)'})
-        
+
+
+
+class AutotestSettingForm(forms.ModelForm):
+    class Meta:
+        model = AutotestSetting
+        fields = [
+            'url'
+        ]
+    def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+            self.fields['url'].widget.attrs.update({'class': 'form-control'})
+
+
+
+
+class AutotestSettingParamForm(forms.ModelForm):
+    class Meta:
+        model = AutotestSettingParam
+        fields = [
+            'name',
+            'value'
+        ]
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['name'].widget.attrs.update({'class': 'form-control'})
+        self.fields['value'].widget.attrs.update({'class': 'form-control'})
+            

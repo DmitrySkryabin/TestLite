@@ -1,9 +1,70 @@
 {% extends 'main.html' %}
 
 {% block content %}
+<div class="container-fluid h-100">
+    <div class="row h-100">
+        <div class="col-md-2 h-100 border-end">
+            <div class="row h-6dot4">
+                <div class="container d-flex justify-content-between align-items-center">
+                    <h3>{{ request.resolver_match.kwargs.project }}</h3>
+                </div>
+            </div>
+            <div class="row h-93dot6">
+                <div class="container">
+                    <ul class="list-group" id="v-pills-tab" role="tablist">
+                        <li class="list-group-item d-flex justify-content-between align-items-start table-row-clickable active" data-bs-toggle="pill" role="tab" data-bs-target="#cicdrules">
+                            <span class="fw-bold">Правила CI/CD</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-start table-row-clickable" data-bs-toggle="pill" role="tab" data-bs-target="#test">
+                            <span class="fw-bold">Test</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-10 h-100">
+            <div class="tab-content h-100" id="v-pills-tabContent">
+                <div class="tab-pane h-100 fade show active" id="cicdrules" role="tabpanel" aria-labelledby="cicdrules">
+                    <div class="row h-6dot4">
+                        <div class="container d-flex align-items-center">
+                            <a href="{% url 'TMS:testsuite_create' request.resolver_match.kwargs.project %}"class="btn btn-warning btn-sm col-auto">Добавить Правило CI/CD</a>
+                        </div>
+                    </div>
+                    <div class="row h-93dot6">
+                        <div class="container">
+                            <div class="table-container border rounded-top h-100">
+                                <table class="table table-sm table-responsive">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th scope="col">#</th>
+                                            <th scope="col">Ключ</th>
+                                            <th scope="col">Название</th>
+                                            <th scope="col">Количество тест кейсов</th>
+                                            <th scope="col">Статус</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for testsuite in object_list %}
+                                        <tr onclick="goToFromTable(this)" class="table-row-clickable" href="{% url 'TMS:testsuite_detail' request.resolver_match.kwargs.project testsuite.pk %}">
+                                            <td>{{ forloop.counter }}</td>
+                                            <td>{{ testsuite.key }}</td>
+                                            <td>{{ testsuite.name }}</td>
+                                            <td>{{ testsuite.test_cases.all.count }}</td>
+                                            <td>{% if testsuite.testsuiterun_set.last.status %}<span class="badge {{ testsuite.testsuiterun_set.last.status|status_bootstrap_class }}">{{ testsuite.testsuiterun_set.last.get_status_display }}</span>{% endif %}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane h-100 fade" id="test" role="tabpanel" aria-labelledby="test">
+                    hahahaha test
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
-<a href="{% url 'TMS:autotest_settings' request.resolver_match.kwargs.project %}" class="btn btn-warning">Добавить настройки автотеста</a>
-{% for autotest_setting in autotest_settings %}
-    {{ autotest_setting }}
-{% endfor %}
 {% endblock %}

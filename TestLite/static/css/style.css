@@ -48,6 +48,12 @@ body{
     display: none;
 }
 
+.list-group .active{
+    background: var(--bs-warning) !important;
+    color: black !important;
+    border-color: var(--bs-warning) !important;
+}
+
 .nav-pills .active{
     background: var(--bs-warning) !important;
     color: black !important;

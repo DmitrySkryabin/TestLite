@@ -205,7 +205,7 @@ class TestStepRun(BaseTestStep):
     
 
 
-class AutotestSettings(models.Model):
+class AutotestSetting(models.Model):
     '''Базовые настройки автотестов'''
     url = models.CharField(max_length=200) # Адрес хука
 
@@ -213,9 +213,9 @@ class AutotestSettings(models.Model):
 
 
 
-class AutotestSettingsParams(models.Model):
+class AutotestSettingParam(models.Model):
     '''Параметры к настройкам автотестов'''
     name = models.CharField(max_length=200)
     value = models.CharField(max_length=200)
 
-    autotest_settings = models.ForeignKey(AutotestSettings, on_delete=models.CASCADE)
+    autotest_settings = models.ForeignKey(AutotestSetting, on_delete=models.CASCADE)

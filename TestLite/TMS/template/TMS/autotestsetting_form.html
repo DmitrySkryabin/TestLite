@@ -1,0 +1,11 @@
+{% extends 'main.html' %}
+
+{% block content %}
+    {{ form }}
+
+    {% for param in params %}
+        <div class="form-item">
+            {{ param }}
+        </div>
+    {% endfor %}
+{% endblock %}

@@ -12,9 +12,9 @@ from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import ListView, DetailView, UpdateView, TemplateView, View, CreateView
 from django.forms import BaseModelForm, modelformset_factory
-from .models import Project, TestCase, TestStep, TestSuite, TestSuiteRun, TestStepRun, TestCaseRun, TestCaseFolder, AutotestSettings
+from .models import Project, TestCase, TestStep, TestSuite, TestSuiteRun, TestStepRun, TestCaseRun, TestCaseFolder, AutotestSetting, AutotestSettingParam
 from .models import STATUS, PRIORITY, TYPE
-from .forms import ProjectForm, TestStepForm, TestCaseForm, TestCaseFolderForm, TestSuiteForm, TestStepRunForm, TestStepRunFormset, TestCaseFormset
+from .forms import ProjectForm, TestStepForm, TestCaseForm, TestCaseFolderForm, TestSuiteForm, TestStepRunForm, TestStepRunFormset, TestCaseFormset, AutotestSettingForm, AutotestSettingParamForm
 from .service import TestSuiteSaveHelper
 
 # Create your views here.
@@ -54,19 +54,22 @@ class TestCaseListViewControlRequests:
         print(kwargs)
         return HttpResponse('OK')
     
+
     def delete(request, *args, **kwargs):
-        print(request.POST)
         testcases_ids = request.POST.getlist('test_cases_main')
         # for id in testcases_ids:
         #     TestCase.objects.get(pk=id).delete()
+        print(testcases_ids)
         try:
             for id in testcases_ids:
-                TestCase.objects.get(pk=id).archived = True
+                testcase = TestCase.objects.get(pk=id)
+                testcase.archived = True
+                testcase.save()
             messages.info(request, 'Тест кейсы удалены (заархивированы)')
-            return HttpResponseRedirect('OK')
+            return HttpResponse('OK')
         except:
             messages.error(request, 'Не удалось удалить (заархивировать)')
-            return HttpResponseRedirect('OK')
+            return HttpResponse('OK')
 
 
 
@@ -88,7 +91,7 @@ class TestCaseListView(ListView):
                 obj.status = TestCaseRun.objects.filter(test_case=obj).last().status
             else:
                 obj.status = None
-        context['testcase_all_count'] = TestCase.objects.filter(project=context['project']).count
+        context['testcase_all_count'] = TestCase.objects.filter(project=context['project'], archived=False).count
         context['testcase_folders'] = TestCaseFolder.objects.filter(project=context['project'])
         context['testcase_folder_form'] = TestCaseFolderForm(context['project'])
         return context
@@ -460,13 +463,20 @@ class ProjectSettings(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['autotest_settings'] = AutotestSettings.objects.filter(project__key=kwargs.get('project'))
+        context['autotest_settings'] = AutotestSetting.objects.filter(project__key=kwargs.get('project'))
         return context
     
 
 
 class AutotestSettingsCreateView(CreateView):
-    model = AutotestSettings
+    model = AutotestSetting
+    form_class = AutotestSettingForm
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['params'] = modelformset_factory(AutotestSettingParam, AutotestSettingParamForm)
+        return context
+    
     
     
     
