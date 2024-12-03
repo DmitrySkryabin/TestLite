@@ -7,6 +7,10 @@ urlpatterns = [
     path('', views.ProjectListView.as_view(), name='projects'),
     path('check_project_key/<slug:project>', views.ProjectListView.check_project_key, name='chek_project_key'),
     path('<slug:project>/testcases', views.TestCaseListView.as_view(), name='testcases'),
+    # TestCaseListView управленчиские запросы
+    path('<slug:project>/testcases/folder/add', views.TestCaseListViewControlRequests.add_folder, name='testcases_add_folder'),
+    path('<slug:project>/testcases/delete', views.TestCaseListViewControlRequests.delete, name='testcases_delete'),
+
     path('<slug:project>/testcase/<int:pk>', views.TestCaseDetailView.as_view(), name='testcase_detail'),
     path('<slug:project>/testcase/create', views.TestCaseCreateView.as_view(), name='testcase_create'),
     path('<slug:project>/testcase/<int:pk>/update', views.TestCaseUpdateView.as_view(), name='testcase_update'),
@@ -19,6 +23,8 @@ urlpatterns = [
     path('<slug:project>/testsuite/<int:pk>/execute/v3', views.TestSuiteExecuteV3.as_view(), name='testsuite_execute_v3'),
     path('<slug:project>/testsuite/<int:testsuite_pk>/run/<int:pk>', views.TestSuiteRunDetailView.as_view(), name='testsuiterun_detail'),
     path('<slug:project>/runs', views.TestRunsListView.as_view(), name='runs'),
+    path('<slug:project>/settings', views.ProjectSettings.as_view(), name='project_settings'),
+    path('<slug:project>/settings/autotest', views.AutotestSettingsCreateView.as_view(), name='autotest_settings'),
 
     # TestSuiteExecuteV2 доп запросы
     path('<slug:project>/testsuite/<int:pk>/execute/v2/<int:testsuiterun_pk>', views.TestSuiteExecuteV2.as_view(), name='testsuite_execute_v2'),

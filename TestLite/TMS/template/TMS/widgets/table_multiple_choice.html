@@ -2,7 +2,7 @@
 <table {% if id %} id="{{ id }}" {% endif %} class="table table-sm table-responsive {% if widget.attrs.class %}{{ widget.attrs.class }}{% endif %}">
   <thead class="table-light">
     <tr>
-      <td><input type="checkbox" onclick="checkAllCheckBoxes(this)" id="checkAllCheckboxes"></td>
+      <td><input type="checkbox" onclick="checkAllCheckBoxesFolder(this)" id="checkAllCheckboxesFolder"></td>
       <td>Ключ</td>
       <td>Название</td>
       <td>Версия</td>
@@ -11,7 +11,7 @@
   </thead>
   <tbody>
     {% for testcase in testcases %}
-      <tr onclick="checkUncheckCheckbox(this)" class="table-row-clickable">
+      <tr onclick="checkUncheckCheckboxFolder(this)" class="table-row-clickable">
         <td><input type="checkbox" name="test_cases" value="{{ testcase.pk }}" id="id_test_cases_{{ forloop.counter0 }}" onclick="this.click()" {% if testcase.selected %} checked {% endif %}></td>
         <td>{{ testcase.key }}</td>
         <td>{{ testcase.name }}</td>
@@ -23,40 +23,40 @@
 </table>
 <script>
 
-  let checkedCheckboxes = 0;
-  const allCheckBoxes = document.querySelectorAll('input[type=checkbox][name=test_cases]');
+  let checkedCheckboxesFolder = 0;
+  const allCheckBoxesFolder = document.querySelectorAll('input[type=checkbox][name=test_cases]');
 
-  function checkAllCheckBoxes(elem) {
+  function checkAllCheckBoxesFolder(elem) {
     if (elem.checked == true) {
-      allCheckBoxes.forEach((checkbox) => {
+      allCheckBoxesFolder.forEach((checkbox) => {
         checkbox.checked = true;
       });
     }
     else {
-      allCheckBoxes.forEach((checkbox) => {
+      allCheckBoxesFolder.forEach((checkbox) => {
         checkbox.checked = false;
       });
     }
   };
 
-  function checkUncheckCheckbox(elem) {
+  function checkUncheckCheckboxFolder(elem) {
     const checkbox = elem.querySelector('input[type=checkbox]');
     checkbox.click();
   };
 
-  allCheckBoxes.forEach(function(item) {
+  allCheckBoxesFolder.forEach(function(item) {
     item.addEventListener('change', function(event) {
       if (event.target.checked == true) {
-        checkedCheckboxes++;
+        checkedCheckboxesFolder++;
       }
       else {
-        checkedCheckboxes--;
+        checkedCheckboxesFolder--;
       }
-      if (checkedCheckboxes == allCheckBoxes.length) {
-        document.getElementById('checkAllCheckboxes').checked = true;
+      if (checkedCheckboxesFolder == allCheckBoxesFolder.length) {
+        document.getElementById('checkAllCheckboxesFolder').checked = true;
       }
       else {
-        document.getElementById('checkAllCheckboxes').checked = false;
+        document.getElementById('checkAllCheckboxesFolder').checked = false;
       }
     })
   });

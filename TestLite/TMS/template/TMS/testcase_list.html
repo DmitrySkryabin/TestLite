@@ -8,7 +8,7 @@
             <div class="row h-6dot4">
                 <div class="container d-flex justify-content-between align-items-center">
                     <h3>{{ project.key }}</h3>
-                    <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#addFolderModal">Добавить группу</button>
+                    <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#addFolderModal" onclick="clearCheckboxesInAddFolderModal()">Добавить группу</button>
                 </div>
             </div>
             <div class="row h-93dot6">
@@ -36,6 +36,10 @@
             <div class="row h-6dot4">
                 <div class="container d-flex align-items-center">
                     <a href="{% url 'TMS:testcase_create' project.key %}"class="btn btn-warning btn-sm col-auto">Добавить тест кейс</a>
+                    <div class="manage-test-case-group ms-4" id="manage-test-case-group">
+                        <button class="btn btn-primary btn-sm col-auto me-1" onclick="addFolder()">Добавить в группу</button>
+                        <button class="btn btn-danger btn-sm col-auto me-1" data-bs-toggle="modal" data-bs-target="#deleteTestCaseModal">Удалить</button>
+                    </div>
                 </div>
             </div>
             <div class="row h-93dot6">
@@ -44,7 +48,7 @@
                         <table class="table table-sm table-responsive">
                             <thead class="table-light">
                                 <tr>
-                                    <th scope="col">#</th>
+                                    <th scope="col"><input type="checkbox" onclick="checkAllCheckBoxesMain(this)" id="checkAllCheckboxesMain"></th>
                                     <th scope="col">Ключ</th>
                                     <th scope="col">Название</th>
                                     <th scope="col">Версия</th>
@@ -54,13 +58,13 @@
                             </thead>
                             <tbody>
                                 {% for testcase in object_list %}
-                                <tr onclick="goToFromTable(this)" class="table-row-clickable" href="{% url 'TMS:testcase_detail' project.key testcase.id %}">
-                                    <td>{{ forloop.counter }}</td>
-                                    <td>{{ testcase.key }}</td>
-                                    <td>{{ testcase.name }}</td>
-                                    <td>{{ testcase.version }}</td>
-                                    <td><span class="badge {{ testcase.priority|priority_bootstrap_class }}">{{ testcase.get_priority_display }}</span></td>
-                                    <td>{% if testcase.status %}<span class="badge {{ testcase.status|status_bootstrap_class }}">{{ testcase.get_status_display }}</span>{% endif %}</td>
+                                <tr class="table-row-clickable" href="{% url 'TMS:testcase_detail' project.key testcase.id %}">
+                                    <td><input type="checkbox" name="test_cases_main" value="{{ testcase.pk }}" id="id_test_cases_{{ forloop.counter0 }}"  {% if testcase.selected %} checked {% endif %}></td>
+                                    <td onclick="goToFromTable(this)">{{ testcase.key }}</td>
+                                    <td onclick="goToFromTable(this)">{{ testcase.name }}</td>
+                                    <td onclick="goToFromTable(this)">{{ testcase.version }}</td>
+                                    <td onclick="goToFromTable(this)"><span class="badge {{ testcase.priority|priority_bootstrap_class }}">{{ testcase.get_priority_display }}</span></td>
+                                    <td onclick="goToFromTable(this)">{% if testcase.status %}<span class="badge {{ testcase.status|status_bootstrap_class }}">{{ testcase.get_status_display }}</span>{% endif %}</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
@@ -102,12 +106,31 @@
     </div>
 </div>
 
+<div class="modal fade" id="deleteTestCaseModal" tabindex="-1" aria-labelledby="deleteTestCaseModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Удаление</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Вы действительно хотите удалить эти тест кейсы?</p>
+              </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                <button type="button" class="btn btn-danger" onclick="deleteTestCases()">Удалить</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="toast-container position-fixed bottom-0 end-0 p-3">
     {% if messages %}
         {% for message in messages %}
             <div class="toast" role="alert" aria-live="assertive" aria-atomic="true">
-                <div class="toast-header {% if message.tags == 'error' %} bg-danger text-light {% endif %}">
-                <strong class="me-auto">Ошибка</strong>
+                <div class="toast-header {% if message.tags == 'error' %} bg-danger text-light {% endif %}{% if message.tags == 'info' %} bg-warning {% endif %}">
+                {% if message.tags == 'error' %}<strong class="me-auto">Ошибка</strong>{% endif %}
+                {% if message.tags == 'info' %}<strong class="me-auto">Успешно</strong>{% endif %}
                 <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
                 </div>
                 <div class="toast-body">
@@ -117,6 +140,106 @@
         {% endfor %}
     {% endif %}
 </div>
+
+<script>
+    
+    let checkedCheckboxesMain = 0;
+    const allCheckBoxesMain = document.querySelectorAll('input[type=checkbox][name=test_cases_main]');
+
+    function checkAllCheckBoxesMain(elem) {
+        if (elem.checked == true) {
+            allCheckBoxesMain.forEach((checkbox) => {
+            checkbox.checked = true;
+            document.getElementById('manage-test-case-group').style.display = "block"
+            });
+        }
+        else {
+            allCheckBoxesMain.forEach((checkbox) => {
+            checkbox.checked = false;
+            document.getElementById('manage-test-case-group').style.display = "none"
+            });
+        }
+    };
+
+    function checkUncheckCheckboxMain(elem) {
+        const checkbox = elem.querySelector('input[type=checkbox]');
+        checkbox.click();
+    };
+
+    allCheckBoxesMain.forEach(function(item) {
+        item.addEventListener('change', function(event) {
+            if (event.target.checked == true) {
+                checkedCheckboxesMain++;
+            }
+            else {
+                checkedCheckboxesMain--;
+            }
+            if (checkedCheckboxesMain == allCheckBoxesMain.length) {
+                document.getElementById('checkAllCheckboxesMain').checked = true;
+            }
+            else {
+                document.getElementById('checkAllCheckboxesMain').checked = false;
+            }
+            if (checkedCheckboxesMain > 0) {
+                document.getElementById('manage-test-case-group').style.display = "block"
+            }
+            else {
+                document.getElementById('manage-test-case-group').style.display = "none"
+            }
+        })
+    });
+
+    function clearCheckboxesInAddFolderModal() {
+        document.querySelectorAll('input[type=checkbox][name=test_cases]').forEach(function(item) {
+            item.checked = false;
+        })
+    }
+
+    function addFolder() {
+
+        const addFolderModal = new bootstrap.Modal(document.getElementById("addFolderModal"), {});
+
+        clearCheckboxesInAddFolderModal();
+
+        allCheckBoxesMain.forEach(function(item) {
+            if (item.checked == true){
+                document.querySelector('input[type=checkbox][name=test_cases][id=' + item.id + ']').checked = true;
+            }
+        })
+
+        addFolderModal.show();
+    }
+
+    async function deleteTestCases(){
+        const testCasesForDelete = document.querySelectorAll('input[type=checkbox][name=test_cases_main]:checked');
+        const form = document.createElement("form");
+        testCasesForDelete.forEach(function(item) {
+            form.appendChild(item);
+        });
+        let formData = new FormData(form);
+        const curUrl = window.location.href
+        const request = new Request(
+            curUrl + '/delete',
+            {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: formData
+            }
+        );
+        try {
+            let response = await fetch(request);
+            if (response.status = 200) {
+                window.location.href = curUrl;
+            }
+        } catch (err) {
+            console.log(err);
+        }
+    }
+
+
+</script>
 
 <script type="module">
     const toasts = document.querySelectorAll('.toast');
@@ -140,6 +263,5 @@
             }, false)
         })
     })
-
 </script>
 {% endblock %}

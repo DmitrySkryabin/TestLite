@@ -10,6 +10,8 @@
                         class="nav-link px-0 text-white">Тест суиты</a></li>
                 <li><a href="{% url 'TMS:runs' request.resolver_match.kwargs.project %}"
                         class="nav-link text-white">Прогоны</a></li>
+                <li><a href="{% url 'TMS:project_settings' request.resolver_match.kwargs.project %}"
+                        class="nav-link text-white">Настройки проекта</a></li>
             </ul>
             {% else %}
             <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">

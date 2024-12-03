@@ -1,4 +1,6 @@
 function goToFromTable(elem) {
-    url = elem.getAttribute('href');
+    console.log(elem.closest('.table-row-clickable'));
+    tr = elem.closest('.table-row-clickable')
+    url = tr.getAttribute('href');
     location.href = url;
 }

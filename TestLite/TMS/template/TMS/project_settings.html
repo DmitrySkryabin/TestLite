@@ -1,0 +1,9 @@
+{% extends 'main.html' %}
+
+{% block content %}
+
+<a href="{% url 'TMS:autotest_settings' request.resolver_match.kwargs.project %}" class="btn btn-warning">Добавить настройки автотеста</a>
+{% for autotest_setting in autotest_settings %}
+    {{ autotest_setting }}
+{% endfor %}
+{% endblock %}

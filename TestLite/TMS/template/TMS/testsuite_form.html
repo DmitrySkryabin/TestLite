@@ -6,8 +6,13 @@
     <div class="container-fluid h-100">
         <div class="row h-100">
             <div class="col-auto pt-2 border-end">
-                <a href="{% url 'TMS:testcases' request.resolver_match.kwargs.project %}" class="btn btn-warning">
+                {% if object.pk is not None %}
+                <a href="{% url 'TMS:testsuite_detail' request.resolver_match.kwargs.project object.pk %}" class="btn btn-warning">
                     <i class="bi bi-arrow-left"></i></a>
+                {% else %}
+                <a href="{% url 'TMS:testsuites' request.resolver_match.kwargs.project %}" class="btn btn-warning">
+                    <i class="bi bi-arrow-left"></i></a>
+                {% endif %}
             </div>
             <div class="col h-100">
                 <div class="row h-6dot4 border-bottom">

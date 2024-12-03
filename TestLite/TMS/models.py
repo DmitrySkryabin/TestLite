@@ -82,6 +82,8 @@ class TestCase(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
     author = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
 
+    archived = models.BooleanField(default=False)
+
     def __str__(self):
         return f'{self.key}:{self.name}'
     
@@ -191,7 +193,6 @@ class TestCaseRun(models.Model):
     
 
     
-
 class TestStepRun(BaseTestStep):
     '''Модель с выполненными шагами'''
     # action = models.TextField()
@@ -202,4 +203,19 @@ class TestStepRun(BaseTestStep):
     def __str__(self):
         return f'{self.test_case_run}:{self.pk}'
     
-    
+
+
+class AutotestSettings(models.Model):
+    '''Базовые настройки автотестов'''
+    url = models.CharField(max_length=200) # Адрес хука
+
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+
+
+
+class AutotestSettingsParams(models.Model):
+    '''Параметры к настройкам автотестов'''
+    name = models.CharField(max_length=200)
+    value = models.CharField(max_length=200)
+
+    autotest_settings = models.ForeignKey(AutotestSettings, on_delete=models.CASCADE)

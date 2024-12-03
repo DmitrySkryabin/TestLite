@@ -1,9 +1,10 @@
 import json
 import datetime
+import re
 from typing import Any
 from django.db.models.base import Model as Model
 from django.db.models.query import QuerySet
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 from django.utils import timezone
 from django.contrib import messages
 from django.shortcuts import redirect
@@ -11,7 +12,7 @@ from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import ListView, DetailView, UpdateView, TemplateView, View, CreateView
 from django.forms import BaseModelForm, modelformset_factory
-from .models import Project, TestCase, TestStep, TestSuite, TestSuiteRun, TestStepRun, TestCaseRun, TestCaseFolder
+from .models import Project, TestCase, TestStep, TestSuite, TestSuiteRun, TestStepRun, TestCaseRun, TestCaseFolder, AutotestSettings
 from .models import STATUS, PRIORITY, TYPE
 from .forms import ProjectForm, TestStepForm, TestCaseForm, TestCaseFolderForm, TestSuiteForm, TestStepRunForm, TestStepRunFormset, TestCaseFormset
 from .service import TestSuiteSaveHelper
@@ -42,14 +43,41 @@ class ProjectListView(ListView):
             return JsonResponse({'is_exist': True})
 
 
+
+class TestCaseListViewControlRequests:
+
+    def add_folder(request, *args, **kwargs):
+        '''Не используем пока нашел другой путь'''
+        print(request)
+        print(request.POST)
+        print(args)
+        print(kwargs)
+        return HttpResponse('OK')
+    
+    def delete(request, *args, **kwargs):
+        print(request.POST)
+        testcases_ids = request.POST.getlist('test_cases_main')
+        # for id in testcases_ids:
+        #     TestCase.objects.get(pk=id).delete()
+        try:
+            for id in testcases_ids:
+                TestCase.objects.get(pk=id).archived = True
+            messages.info(request, 'Тест кейсы удалены (заархивированы)')
+            return HttpResponseRedirect('OK')
+        except:
+            messages.error(request, 'Не удалось удалить (заархивировать)')
+            return HttpResponseRedirect('OK')
+
+
+
 class TestCaseListView(ListView):
 
     def get_queryset(self) -> QuerySet[Any]:
         folder = self.request.GET.get('folder')
         if folder is not None:
-            return TestCase.objects.filter(project__key=self.kwargs.get('project'), testcasefolder__id=folder)
+            return TestCase.objects.filter(project__key=self.kwargs.get('project'), testcasefolder__id=folder, archived=False)
         else:
-            return TestCase.objects.filter(project__key=self.kwargs.get('project'))
+            return TestCase.objects.filter(project__key=self.kwargs.get('project'), archived=False)
 
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
@@ -70,6 +98,7 @@ class TestCaseListView(ListView):
         self.object_list = self.get_queryset()
         testcase_folder_form = TestCaseFolderForm(Project.objects.get(key=kwargs.get('project')), request.POST)
         if testcase_folder_form.is_valid():
+            print(request.POST)
             folder: TestCaseFolder = testcase_folder_form.save(commit=False)
             folder.project = Project.objects.get(key=kwargs.get('project'))
             folder.save()
@@ -423,6 +452,21 @@ class TestSuiteRunDetailView(DetailView):
         context = super().get_context_data(**kwargs)
         context['testcaseruns'] = TestCaseRun.objects.filter(test_suite_run=self.object)
         return context
+    
+
+
+class ProjectSettings(TemplateView):
+    template_name = 'TMS/project_settings.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['autotest_settings'] = AutotestSettings.objects.filter(project__key=kwargs.get('project'))
+        return context
+    
+
+
+class AutotestSettingsCreateView(CreateView):
+    model = AutotestSettings
     
     
 

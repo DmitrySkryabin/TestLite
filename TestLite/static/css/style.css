@@ -44,6 +44,10 @@ body{
     background-color: #fff3cd;
 }
 
+.manage-test-case-group{
+    display: none;
+}
+
 .nav-pills .active{
     background: var(--bs-warning) !important;
     color: black !important;
@@ -105,6 +109,20 @@ body{
 /* .testcaserun-list{
     border: var(--bs-warning) !important;
 } */
+
+.wrapper{
+    display: flex;
+  }
+  
+.handler{
+width: 5px;
+padding: 0;
+cursor: ew-resize;
+flex: 0 0 auto;
+height: 100%;
+}
+  
+  
 
 .testcaserun-list li:hover{
     background: #fff3cd !important;
