@@ -1,11 +1,248 @@
 {% extends 'main.html' %}
 
 {% block content %}
-    {{ form }}
 
-    {% for param in params %}
-        <div class="form-item">
-            {{ param }}
+<form action="" method="post" class="h-100 testcase-form">
+    {% csrf_token %}
+    <div class="container-fluid h-100">
+        <div class="row h-100">
+            <div class="col-auto pt-2 border-end">
+                <a href="{% url 'TMS:project_settings' request.resolver_match.kwargs.project %}"
+                    class="btn btn-warning">
+                    <i class="bi bi-arrow-left"></i></a>
+            </div>
+            <div class="col h-100">
+                <div class="row h-6dot4 border-bottom">
+                    <div class="container pb-2 pt-2">
+                        <div class="row">
+                            <div class="col">
+                                {{ form.name }}
+                            </div>
+                            <div class="col-md-2 d-flex justify-content-between align-items-center">
+                                <button type="submit" class="btn btn-success">Сохранить</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row h-93dot6">
+                    <div class="col-10">
+                        <div class="row mt-2">
+                            <div class="container">
+                                <h5>URL</h5>
+                                {{ form.url }}
+                            </div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="container">
+                                <h5>Метод</h5>
+                                {{ form.method }}
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="container">
+                                <div class="row">
+                                    <h5>Параметры</h5>
+                                </div>
+                                <ul class="list-group list-group-horizontal mb-1 teststep hide" id="forCopy">
+                                    <li class="list-group-item bg-secondary text-light col-teststep-counter"></li>
+                                    <input type="text" class="list-group-item col">
+                                    <input type="hidden" name="" id="">
+                                    <input type="checkbox" name="" id="" class="hide">
+                                    <div class="dropdown">
+                                        <a class="btn btn-secondary btn-sm" href="#" role="button" id=""
+                                            data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i class="bi bi-three-dots"></i>
+                                        </a>
+                                        <ul class="dropdown-menu" aria-labelledby="">
+                                            <li><a class="dropdown-item text-danger" href="#" param-id="">Удалить</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <input type="text" class="list-group-item col">
+                                </ul>
+                                {{ params.management_form }}
+                                <div class="list-group" id="stepsList">
+                                    {% for param in params %}
+                                    <ul class="list-group list-group-horizontal mb-1 teststep" id="param{{ forloop.counter0 }}">
+                                        <li class="list-group-item bg-secondary text-light col-teststep-counter">{{ forloop.counter }}</li>
+                                        {{ param.name }}
+                                        {{ param.id }}
+                                        {{ param.DELETE}}
+                                        <div class="dropdown">
+                                            <a class="btn btn-secondary btn-sm" href="#" role="button"
+                                                id="testStepActions{{ forloop.counter0 }}" data-bs-toggle="dropdown"
+                                                aria-expanded="false">
+                                                <i class="bi bi-three-dots"></i>
+                                            </a>
+                                            <ul class="dropdown-menu"
+                                                aria-labelledby="testStepActions{{ forloop.counter0 }}">
+                                                <li><a class="dropdown-item text-danger" href="#"
+                                                        param-id="{{ forloop.counter0 }}">Удалить</a></li>
+                                            </ul>
+                                        </div>
+                                        {{ param.value }}
+                                    </ul>
+                                    {% endfor %}
+                                </div>
+                                <button class="btn btn-warning" type="button" id="addParam">Добавить параметр</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-    {% endfor %}
+    </div>
+</form>
+
+<div class="toast-container position-fixed bottom-0 start-0 p-3">
+</div>
+
+<script type="module">
+
+    document.getElementById('addParam').addEventListener('click', function (event) {
+        addParam();
+    });
+
+
+    document.querySelectorAll('a[param-id]').forEach((elem) => {
+        elem.addEventListener('click', function (event) {
+            markForDeleting(event.target)
+        })
+    })
+
+    function showToast(elem) {
+        const toastContainer = document.querySelector('.toast-container')
+        const toast = document.createElement('div')
+        toast.className = 'toast hide';
+        toast.setAttribute('role', 'alert');
+        toast.setAttribute('aria-live', 'assertive');
+        toast.setAttribute('aria-atomic', 'true');
+        toast.id = 'toastForCopy';
+
+        const toastHeader = document.createElement('div');
+        toastHeader.className = 'toast-header';
+
+        const strong = document.createElement('strong');
+        strong.className = 'me-auto';
+        strong.textContent = 'Параметр удален';
+
+        const closeButton = document.createElement('button');
+        closeButton.type = 'button';
+        closeButton.className = 'btn-close';
+        closeButton.setAttribute('data-bs-dismiss', 'toast');
+        closeButton.setAttribute('aria-label', 'Close');
+
+        toastHeader.appendChild(strong);
+        toastHeader.appendChild(closeButton);
+
+        const toastBody = document.createElement('div');
+        toastBody.className = 'toast-body';
+
+        const restoreButton = document.createElement('button');
+        restoreButton.type = 'button';
+        restoreButton.className = 'btn btn-warning btn-sm';
+        restoreButton.textContent = 'Восстановить';
+        restoreButton.onclick = function () {
+            restoreParam(elem);
+        };
+
+        toastBody.appendChild(restoreButton);
+
+        toast.appendChild(toastHeader);
+        toast.appendChild(toastBody);
+
+        toastContainer.append(toast);
+
+        setTimeout(function () {
+            toast.remove();
+        }, 5000);
+
+
+        const toasts = document.querySelectorAll('.toast');
+        toasts.forEach(toast => new window.bootstrap.Toast(toast).show());
+    }
+
+    function restoreParam(elem) {
+        elem.classList.remove('hide');
+        const deleteInput = elem.querySelector('input[name$=DELETE]');
+        if (deleteInput != undefined) {
+            deleteInput.checked = false;
+        }
+        resetPositionNumbers()
+    }
+
+
+    function markForDeleting(elem) {
+        const paramId = elem.getAttribute('param-id');
+        const deleteInput = document.querySelector('input[name$=' + 'form-' + paramId + '-DELETE');
+        deleteInput.checked = true;
+        const paramContainer = document.querySelector('ul[id=param' + paramId + ']')
+        paramContainer.classList.add('hide')
+        resetPositionNumbers()
+        showToast(paramContainer)
+    }
+
+
+    const totalForm = document.getElementById('id_form-TOTAL_FORMS')
+    const stepList = document.getElementById('stepsList');
+    const step = document.querySelector('#forCopy');
+
+    function resetPositionNumbers() {
+        const testStepContainer = document.querySelectorAll('ul[id^=param]:not(.hide)')
+        const counterArray = []
+        testStepContainer.forEach((elem) => {
+            counterArray.push(elem.querySelector('li'))
+        })
+        for (let i = 0; i < counterArray.length; i++) {
+            counterArray[i].innerHTML = i + 1;
+        }
+    }
+
+    const list = document.getElementById('stepsList');
+
+
+    function addParam() {
+        // Копирование элмента и изменение итогового значения форм
+        let totalForms = totalForm.value;
+        let addStep = step.cloneNode(true);
+        addStep.classList.remove('hide')
+        addStep.id = 'param' + totalForms
+        let name = addStep.querySelectorAll('input')[0]
+        let value = addStep.querySelectorAll('input')[3]
+
+        let id = addStep.querySelectorAll('input')[1];
+        let deleteInput = addStep.querySelectorAll('input')[2];
+
+        let dropdown = addStep.querySelector('div')
+        let aInDropdown = dropdown.querySelector('a[data-bs-toggle]')
+        let ulInDropdown = dropdown.querySelector('ul')
+        let deleteInDropdown = dropdown.querySelector('a[param-id]')
+
+        aInDropdown.id = 'autotestParam' + totalForms
+        ulInDropdown.setAttribute('aria-labelledby', 'autotestParam' + totalForms)
+
+        deleteInDropdown.setAttribute('param-id', totalForms)
+
+        name.name = 'form-' + totalForms + '-name'
+        name.id = 'id_form-' + totalForms + '-name'
+        value.name = 'form-' + totalForms + '-value'
+        value.id = 'id_form-' + totalForms + '-value'
+
+        id.name = 'form-' + totalForms + '-id'
+        id.id = 'id_form-' + totalForms + '-id'
+        deleteInput.name = 'form-' + totalForms + '-DELETE'
+        deleteInput.id = 'id_form-' + totalForms + '-DELETE'
+
+        stepList.append(addStep);
+        deleteInDropdown.addEventListener('click', function (event) {
+            markForDeleting(event.target);
+        })
+        resetPositionNumbers();
+
+        totalForms++;
+        totalForm.value = totalForms;
+    }
+
+</script>
+
 {% endblock %}

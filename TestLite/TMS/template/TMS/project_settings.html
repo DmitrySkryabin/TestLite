@@ -27,7 +27,7 @@
                 <div class="tab-pane h-100 fade show active" id="cicdrules" role="tabpanel" aria-labelledby="cicdrules">
                     <div class="row h-6dot4">
                         <div class="container d-flex align-items-center">
-                            <a href="{% url 'TMS:testsuite_create' request.resolver_match.kwargs.project %}"class="btn btn-warning btn-sm col-auto">Добавить Правило CI/CD</a>
+                            <a href="{% url 'TMS:autotest_settings_create' request.resolver_match.kwargs.project %}"class="btn btn-warning btn-sm col-auto">Добавить Правило CI/CD</a>
                         </div>
                     </div>
                     <div class="row h-93dot6">
@@ -37,20 +37,16 @@
                                     <thead class="table-light">
                                         <tr>
                                             <th scope="col">#</th>
-                                            <th scope="col">Ключ</th>
                                             <th scope="col">Название</th>
-                                            <th scope="col">Количество тест кейсов</th>
-                                            <th scope="col">Статус</th>
+                                            <th scope="col">Адрес</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {% for testsuite in object_list %}
-                                        <tr onclick="goToFromTable(this)" class="table-row-clickable" href="{% url 'TMS:testsuite_detail' request.resolver_match.kwargs.project testsuite.pk %}">
+                                        {% for autotest_setting in autotest_settings %}
+                                        <tr onclick="goToFromTable(this)" class="table-row-clickable" href="{% url 'TMS:autotest_settings_update' request.resolver_match.kwargs.project autotest_setting.pk %}">
                                             <td>{{ forloop.counter }}</td>
-                                            <td>{{ testsuite.key }}</td>
-                                            <td>{{ testsuite.name }}</td>
-                                            <td>{{ testsuite.test_cases.all.count }}</td>
-                                            <td>{% if testsuite.testsuiterun_set.last.status %}<span class="badge {{ testsuite.testsuiterun_set.last.status|status_bootstrap_class }}">{{ testsuite.testsuiterun_set.last.get_status_display }}</span>{% endif %}</td>
+                                            <td>{{ autotest_setting.name }}</td>
+                                            <td>{{ autotest_setting.url }}</td>
                                         </tr>
                                         {% endfor %}
                                     </tbody>

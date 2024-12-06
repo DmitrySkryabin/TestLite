@@ -136,12 +136,12 @@ class TestSuiteForm(forms.ModelForm):
         fields = [
             'name',
             'description',
-            'test_cases'
+            'test_cases',
+            'autotest_setting'
         ]
 
     def __init__(self, project=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
         if project is None:
             queryset = TestCase.objects.filter(project=kwargs.get('instance').project)
         else:
@@ -154,6 +154,8 @@ class TestSuiteForm(forms.ModelForm):
             widget=TableModelMultipleChoiceField,
             required=True
         )
+        self.fields['autotest_setting'].queryset = AutotestSetting.objects.filter(project=kwargs.get('instance').project)
+        self.fields['autotest_setting'].widget.attrs.update({'class': 'form-control'})
 
 
 
@@ -209,12 +211,15 @@ class AutotestSettingForm(forms.ModelForm):
     class Meta:
         model = AutotestSetting
         fields = [
-            'url'
+            'url',
+            'name',
+            'method'
         ]
     def __init__(self, *args, **kwargs):
             super().__init__(*args, **kwargs)
-            self.fields['url'].widget.attrs.update({'class': 'form-control'})
-
+            self.fields['url'].widget.attrs.update({'class': 'form-control', 'placeholder': 'Адресс вебхука'})
+            self.fields['name'].widget.attrs.update({'class': 'form-control', 'placeholder': 'Название'})
+            self.fields['method'].widget.attrs.update({'class': 'form-control', 'placeholder': 'Метод'})
 
 
 
@@ -227,6 +232,15 @@ class AutotestSettingParamForm(forms.ModelForm):
         ]
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['name'].widget.attrs.update({'class': 'form-control'})
-        self.fields['value'].widget.attrs.update({'class': 'form-control'})
+        self.fields['name'].widget.attrs.update({'class': 'list-group-item col'})
+        self.fields['value'].widget.attrs.update({'class': 'list-group-item col'})
+
+
+
+class AutotestSettingParamFormset(forms.BaseModelFormSet):
+
+    def add_fields(self, form, index):
+        super().add_fields(form, index)
+        if 'DELETE' in form.fields:
+            form.fields['DELETE'].widget.attrs.update({'class': 'hide'})
             

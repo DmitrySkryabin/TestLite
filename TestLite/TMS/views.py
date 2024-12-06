@@ -1,6 +1,7 @@
 import json
 import datetime
 import re
+import requests
 from typing import Any
 from django.db.models.base import Model as Model
 from django.db.models.query import QuerySet
@@ -14,7 +15,7 @@ from django.views.generic import ListView, DetailView, UpdateView, TemplateView,
 from django.forms import BaseModelForm, modelformset_factory
 from .models import Project, TestCase, TestStep, TestSuite, TestSuiteRun, TestStepRun, TestCaseRun, TestCaseFolder, AutotestSetting, AutotestSettingParam
 from .models import STATUS, PRIORITY, TYPE
-from .forms import ProjectForm, TestStepForm, TestCaseForm, TestCaseFolderForm, TestSuiteForm, TestStepRunForm, TestStepRunFormset, TestCaseFormset, AutotestSettingForm, AutotestSettingParamForm
+from .forms import ProjectForm, TestStepForm, TestCaseForm, TestCaseFolderForm, TestSuiteForm, TestStepRunForm, TestStepRunFormset, TestCaseFormset, AutotestSettingForm, AutotestSettingParamForm, AutotestSettingParamFormset
 from .service import TestSuiteSaveHelper
 
 # Create your views here.
@@ -468,18 +469,134 @@ class ProjectSettings(TemplateView):
     
 
 
+# class AutotestSettingsCreateUpdateMixin():
+
+#     def get_formset(self, **kwargs):
+#         '''Возвращай в самих уже представлених тот формсет что тебе нужен'''
+#         formset = modelformset_factory(AutotestSettingParam, AutotestSettingParamForm, extra=0, can_delete=True)
+
+#         return formset
+
+
+#     def get_context_data(self, **kwargs):
+#         context = super().get_context_data(**kwargs)
+#         context['params'] = self.get_formset()
+
+#         return context
+    
+    
+#     def form_valid(self, form):
+#         formset = modelformset_factory(AutotestSettingParam, AutotestSettingParamForm, extra=0, can_delete=True)
+#         autotest_settings = formset(self.request.POST)
+#         if autotest_settings.is_valid():
+#             autotest_setting = form.save(commit=False)
+#             autotest_setting.project = Project.objects.get(key=self.kwargs.get('project'))    
+#             autotest_setting.save()
+#             for param in autotest_settings.save(commit=False):
+#                 param.autotest_settings = autotest_setting
+#                 param.save() 
+
+#             return redirect(reverse('TMS:project_settings', kwargs={'project': self.kwargs.get('project')}))
+
+
+# class AutotestSettingsCreateView(AutotestSettingsCreateUpdateMixin, CreateView):
+#     model = AutotestSetting
+#     form_class = AutotestSettingForm
+    
+#     def get_formset(self, **kwargs):
+#         formset = super().get_formset()
+#         return formset(queryset=AutotestSettingParam.objects.none())
+        
+
+# class AutotestSettingsUpdateView(AutotestSettingsCreateUpdateMixin, UpdateView):
+#     model = AutotestSetting
+#     form_class = AutotestSettingForm
+    
+#     def get_data_for_formset(self, **kwargs):
+#         formset = super().get_formset()
+#         return formset(queryset=AutotestSettingParam.objects.filter(autotest_settings__pk=self.kwargs.get('pk')))
+
 class AutotestSettingsCreateView(CreateView):
     model = AutotestSetting
     form_class = AutotestSettingForm
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['params'] = modelformset_factory(AutotestSettingParam, AutotestSettingParamForm)
+        params = modelformset_factory(AutotestSettingParam, AutotestSettingParamForm, formset=AutotestSettingParamFormset, extra=0, can_delete=True)
+        if self.request.POST:
+            context['params'] = params(self.request.POST)
+        else:
+            context['params'] = params(queryset=AutotestSettingParam.objects.none())
+
         return context
     
     
+    def form_valid(self, form):
+        context = self.get_context_data()
+
+        if context['params'].is_valid():
+            autotest_setting = form.save(commit=False)
+            autotest_setting.project = Project.objects.get(key=self.kwargs.get('project'))    
+            autotest_setting.save()
+            for param in context['params'].save(commit=False):
+                param.autotest_settings =autotest_setting
+                param.save() 
+            for param in context['params'].deleted_objects:
+                param.delete()
+
+            return redirect(reverse('TMS:project_settings', kwargs={'project': self.kwargs.get('project')}))
+        
+
+class AutotestSettingsUpdateView(UpdateView):
+    model = AutotestSetting
+    form_class = AutotestSettingForm
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        params = modelformset_factory(AutotestSettingParam, AutotestSettingParamForm, formset=AutotestSettingParamFormset, extra=0, can_delete=True)
+        if self.request.POST:
+            context['params'] = params(self.request.POST)
+        else:
+            context['params'] = params(queryset=AutotestSettingParam.objects.filter(autotest_settings__pk=self.kwargs.get('pk')))
+
+        return context
     
     
+    def form_valid(self, form):
+        context = self.get_context_data()
+        
+        if context['params'].is_valid():
+            autotest_setting = form.save(commit=False)
+            autotest_setting.project = Project.objects.get(key=self.kwargs.get('project'))    
+            autotest_setting.save()
+            for param in context['params'].save(commit=False):
+                param.autotest_settings = autotest_setting
+                param.save() 
+            for param in context['params'].deleted_objects:
+                param.delete()
+
+            return redirect(reverse('TMS:project_settings', kwargs={'project': self.kwargs.get('project')}))
+    
+    
+
+class Trigger:
+
+    def trigger_hook(request, *args, **kwargs):
+        autotest_setting = TestSuite.objects.get(pk=kwargs.get('pk')).autotest_setting
+        params = {param.name: param.get_value(kwargs.get('pk')) for param in autotest_setting.autotestsettingparam_set.all()}
+        response = requests.request(
+            method=autotest_setting.method,
+            url=autotest_setting.url,
+            params=params
+        )
+        if response.status_code == 200:
+            messages.success(request, 'Упешно триггернули пайплайн')
+            return redirect(reverse('TMS:testsuite_detail', kwargs={'project':kwargs.get('project'), 'pk': kwargs.get('pk')}))
+        else:
+            messages.error(request, 'Не удалось триггернуть пайплайн')
+            return redirect(reverse('TMS:testsuite_detail', kwargs={'project':kwargs.get('project'), 'pk': kwargs.get('pk')}))
+
+
 
 class API:
 

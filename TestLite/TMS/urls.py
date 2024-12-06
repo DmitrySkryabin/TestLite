@@ -16,6 +16,9 @@ urlpatterns = [
     path('<slug:project>/testcase/<int:pk>/update', views.TestCaseUpdateView.as_view(), name='testcase_update'),
     path('<slug:project>/testsuites', views.TestSuiteListView.as_view(), name='testsuites'),
     path('<slug:project>/testsuite/<int:pk>', views.TestSuiteDetailView.as_view(), name='testsuite_detail'),
+    # Запрос для триггера хуков
+    path('<slug:project>/testsuite/<int:pk>/trigger_hook', views.Trigger.trigger_hook, name='trigger_hook'),
+
     path('<slug:project>/testsuite/create', views.TestSuiteCreateView.as_view(), name='testsuite_create'),
     path('<slug:project>/testsuite/<int:pk>/update', views.TestSuiteUpdateView.as_view(), name='testsuite_update'),
     path('<slug:project>/testsuite/<int:pk>/execute/v1', views.TestSuiteExecuteV1.as_view(), name='testsuite_execute_v1'),
@@ -24,7 +27,8 @@ urlpatterns = [
     path('<slug:project>/testsuite/<int:testsuite_pk>/run/<int:pk>', views.TestSuiteRunDetailView.as_view(), name='testsuiterun_detail'),
     path('<slug:project>/runs', views.TestRunsListView.as_view(), name='runs'),
     path('<slug:project>/settings', views.ProjectSettings.as_view(), name='project_settings'),
-    path('<slug:project>/settings/autotest', views.AutotestSettingsCreateView.as_view(), name='autotest_settings'),
+    path('<slug:project>/settings/autotest/create', views.AutotestSettingsCreateView.as_view(), name='autotest_settings_create'),
+    path('<slug:project>/settings/autotest/<int:pk>/update', views.AutotestSettingsUpdateView.as_view(), name='autotest_settings_update'),
 
     # TestSuiteExecuteV2 доп запросы
     path('<slug:project>/testsuite/<int:pk>/execute/v2/<int:testsuiterun_pk>', views.TestSuiteExecuteV2.as_view(), name='testsuite_execute_v2'),

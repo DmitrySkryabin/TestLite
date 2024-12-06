@@ -47,6 +47,11 @@ class TYPE(models.TextChoices):
     AUTO = 'A', _('Авто')
 
 
+class TRIGGER_METHOD(models.TextChoices):
+    GET = 'GET'
+    POST = 'POST'
+
+
 class Project(models.Model):
     '''Проект к которому привязаны все тест кейсы'''
     name = models.CharField(max_length=200)
@@ -128,6 +133,39 @@ class TestStep(BaseTestStep):
         ordering = ['position']
     
     
+
+class AutotestSetting(models.Model):
+    '''Базовые настройки автотестов'''
+    name = models.CharField(max_length=200)
+    url = models.CharField(max_length=200) # Адрес хука
+    method = models.CharField(max_length=10, choices=TRIGGER_METHOD)
+
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.name
+
+
+
+class AutotestSettingParam(models.Model):
+    '''Параметры к настройкам автотестов'''
+    name = models.CharField(max_length=200)
+    value = models.CharField(max_length=200)
+
+    autotest_settings = models.ForeignKey(AutotestSetting, on_delete=models.CASCADE)
+
+    def get_value(self, testsuite_id):
+        if '$' in self.value:
+            match self.value:
+                case '$PROJECT':
+                    return TestSuite.objects.get(pk=testsuite_id).project.key
+                case '$KEY':
+                    return TestSuite.objects.get(pk=testsuite_id).key
+                case '$NAME':
+                    return TestSuite.objects.get(pk=testsuite_id).name
+        else:
+            return self.value
+
     
 
 class TestSuite(models.Model):
@@ -137,6 +175,7 @@ class TestSuite(models.Model):
     description = models.TextField()
 
     test_cases = models.ManyToManyField(TestCase)
+    autotest_setting = models.ForeignKey(AutotestSetting, on_delete=models.CASCADE, null=True, blank=True)
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
 
     def __str__(self):
@@ -203,19 +242,3 @@ class TestStepRun(BaseTestStep):
     def __str__(self):
         return f'{self.test_case_run}:{self.pk}'
     
-
-
-class AutotestSetting(models.Model):
-    '''Базовые настройки автотестов'''
-    url = models.CharField(max_length=200) # Адрес хука
-
-    project = models.ForeignKey(Project, on_delete=models.CASCADE)
-
-
-
-class AutotestSettingParam(models.Model):
-    '''Параметры к настройкам автотестов'''
-    name = models.CharField(max_length=200)
-    value = models.CharField(max_length=200)
-
-    autotest_settings = models.ForeignKey(AutotestSetting, on_delete=models.CASCADE)

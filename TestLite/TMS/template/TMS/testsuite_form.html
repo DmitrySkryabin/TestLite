@@ -37,6 +37,9 @@
                             <button class="nav-link active d-flex mb-1" id="teststeps-tab" data-bs-toggle="pill"
                                 data-bs-target="#teststeps" type="button" role="tab" aria-controls="teststeps"
                                 aria-selected="true">Тест кейсы</button>
+                            <button class="nav-link d-flex mb-1" id="autotest-tab" data-bs-toggle="pill"
+                                data-bs-target="#autotest" type="button" role="tab" aria-controls="autotest"
+                                aria-selected="false">Автотесты</button>
                             <button class="nav-link d-flex mb-1" id="description-tab" data-bs-toggle="pill"
                                 data-bs-target="#description" type="button" role="tab" aria-controls="description"
                                 aria-selected="false">Описание</button>
@@ -48,6 +51,16 @@
                                 aria-labelledby="teststeps">
                                 <div class="container testcase-collapse-content">
                                     {{ form.test_cases }}
+                                </div>
+                            </div>
+                            <div class="tab-pane fade h-100" id="autotest" role="tabpanel" aria-labelledby="autotest">
+                                <div class="container h-100">
+                                    <div class="row mb-2">
+                                        <label for="cicdrule" class="col-auto col-form-label">Правило CI/CD</label>
+                                        <div class="col" id="cicdrule">
+                                            {{ form.autotest_setting }}
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             <div class="tab-pane fade h-100" id="description" role="tabpanel" aria-labelledby="description">
