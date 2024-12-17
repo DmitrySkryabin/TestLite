@@ -8,6 +8,10 @@ body{
     --bg-error-light: #ffe7e6;
 }
 
+.me-0dot5 {
+    margin-right: .12rem !important;
+}
+
 .h-6dot4{
     height: var(--header-height);
 }
@@ -155,4 +159,12 @@ height: 100%;
 
 .bg-error-light{
     background: var(--bg-error-light);
+}
+
+.total-testcase{
+    cursor: pointer;
+}
+
+.total-testcase .clicked{
+    background: blue !important;
 }

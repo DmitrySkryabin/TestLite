@@ -23,7 +23,7 @@ class TestSuiteSaveHelper:
             testcase_run.start_time = testrun['startime_readable']
             testcase_run.stop_time = testrun['stoptime_readable']
             testcase_run.duration = testrun['duration']
-            testcase_run.type = TYPE.AUTO
+            testcase_run.type = type
             testcase_run.status = STATUS[testrun['status'].upper()]
             if testrun['precondition_status'] is not None:
                 testcase_run.precondition_status = STATUS[testrun['precondition_status'].upper()] 
@@ -32,6 +32,9 @@ class TestSuiteSaveHelper:
             testcase_run.log = testrun['log']
             testcase_run.report = testrun['report']
             testcase_run.skipreason = testrun['skipreason']
+            testcase_run.params = testrun['params']
+            testcase_run.fixtures = testrun['fixtures']
+            testcase_run.parametrize_name = testrun['parametrize_name']
             testcase_run.test_case = TestCase.objects.get(key=testrun['testcase_key'])
             testcase_run.test_suite_run = testsuite_run
             testcase_run.save()

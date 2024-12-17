@@ -154,7 +154,10 @@ class TestSuiteForm(forms.ModelForm):
             widget=TableModelMultipleChoiceField,
             required=True
         )
-        self.fields['autotest_setting'].queryset = AutotestSetting.objects.filter(project=kwargs.get('instance').project)
+        if project is None:
+            self.fields['autotest_setting'].queryset = AutotestSetting.objects.filter(project=kwargs.get('instance').project)
+        else:
+            self.fields['autotest_setting'].queryset = AutotestSetting.objects.filter(project=Project.objects.get(key=project))
         self.fields['autotest_setting'].widget.attrs.update({'class': 'form-control'})
 
 

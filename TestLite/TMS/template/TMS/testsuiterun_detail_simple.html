@@ -1,7 +1,6 @@
 {% extends 'main.html' %}
 
 {% block content %}
-{{ testcaseruns_with_params }}
 <div class="container-fluid h-100">
     <div class="row h-100">
         <div class="col-auto pt-2 border-end">
@@ -22,32 +21,23 @@
                 <div class="wrapper ps-0 h-100">
                     <div class="box h-100 border-end">
                         <div class="p-0 overflow-auto ">
-                            <div class="pt-2 pb-2 d-flex justify-content-end border-bottom bg-light">
-                                <span class="badge bg-success me-0dot5 total-testcase" id="total-passed" title="Успешно" onclick="hideShowTestCases(this)" data-clicked="false">0</span>
-                                <span class="badge bg-secondary me-0dot5 total-testcase" id="total-skip" title="Пропущено" onclick="hideShowTestCases(this)" data-clicked="false">0</span>
-                                <span class="badge bg-warning me-0dot5 total-testcase" id="total-error" title="Ошибка" onclick="hideShowTestCases(this)" data-clicked="false">0</span>
-                                <span class="badge bg-danger me-0dot5 total-testcase" id="total-fail" title="Провал" onclick="hideShowTestCases(this)" data-clicked="false">0</span>
-                            </div>
-                            <ul class="list-group list-group-flush list-group-sm testcaserun-list" id="testcaserun-list">
+                            <ul class="list-group list-group-flush list-group-sm testcaserun-list">
                             {% for testcaserun in testcaseruns %}
-                                <li role="tab" type="button" class="list-group-item p-1 testcaseresult" status="{{ testcaserun.status }}" data-bs-toggle="tab" data-bs-target="#TestCaseRun{{ testcaserun.id }}" aria-controls="TestCaseRun{{ testcaserun.id }}" folder-testcaserun="{% if testcaserun.parametrize_name != 'None' %}{{ testcaserun.test_case.name }}{% endif %}">
-                                    <div class="d-flex justify-content-between">
-                                        <div class="d-flex">
-                                            <div class="col-auto">
-                                                <span class="me-2">{{ testcaserun.status|status_bootstrap_icon_class }}</span>
-                                            </div>
-                                            <div>
-                                                {{ testcaserun.test_case.name }}{% if testcaserun.parametrize_name != 'None' %}{{ testcaserun.parametrize_name }}{% endif %}
-                                            </div>
+                                <li role="tab" type="button" class="list-group-item p-1 d-flex justify-content-between" data-bs-toggle="tab" data-bs-target="#TestCaseRun{{ testcaserun.id }}" aria-controls="TestCaseRun{{ testcaserun.id }}">
+                                    <div class="d-flex">
+                                        <div class="col-auto">
+                                            <span class="me-2">{{ testcaserun.status|status_bootstrap_icon_class }}</span>
                                         </div>
-                                        <div class="ms-2">
-                                            {{ testcaserun.duration }}
+                                        <div>
+                                            {{ testcaserun.test_case.name }}{% if testcaserun.parametrize_name != 'None' %}{{ testcaserun.parametrize_name }}{% endif %}
                                         </div>
+                                    </div>
+                                    <div class="ms-2">
+                                        {{ testcaserun.duration }}
                                     </div>
                                 </li> 
                             {% endfor %}
                             </ul>
-                            <ul class="list-group list-group-flush list-group-sm testcaserun-list" id="testcaserun-list-new"></ul>
                         </div>
                     </div>
                     <div class="handler"></div>
@@ -227,287 +217,5 @@
     // Turn off dragging flag when user mouse is up
     isHandlerDragging = false;
     });
-</script>
-
-<script>
-    // Тут скрипт чтобы иметь папки в списках тестов
-    const testcaseul = document.getElementById('testcaserun-list');
-    const testcaselist = testcaseul.querySelectorAll('li');
-    const testcaselistnew = document.getElementById('testcaserun-list-new');
-
-    // function status_counter(testStatus, ms_2) {
-    //     let folder_status = document.createElement('span')
-    //     if (testStatus == 'P') {
-    //         succes_folder = folder_status.cloneNode()
-    //         succes_folder.innerHTML = '<i class="bi bi-check-circle-fill text-success h4" title="Успешно"></i>'
-    //         ms_2.appendChild(succes_folder)
-    //     }
-    //     if (testStatus == 'S') {
-    //         skip_folder = folder_status.cloneNode()
-    //         skip_folder.innerHTML = '<i class="bi bi-dash-circle-fill text-secondary h4" title="Пропущено"></i>'
-    //         ms_2.appendChild(skip_folder)
-    //     }
-    //     if (testStatus == 'E') {
-    //         error_folder = folder_status.cloneNode()
-    //         error_folder.innerHTML = '<i class="bi bi-exclamation-circle-fill text-warning h4" title="Ошибка"></i>'
-    //         ms_2.appendChild(error_folder)
-    //     }
-    //     if (testStatus == 'F') {
-    //         fail_folder = folder_status.cloneNode()
-    //         fail_folder.innerHTML = '<i class="bi bi-x-circle-fill text-danger h4" title="Провал"></i>'
-    //         ms_2.appendChild(fail_folder)
-    //     }
-    // }
-
-    function statusCounter(testStatus, ms_2) {
-        let folder_status = document.createElement('span')
-        if (testStatus == 'P') {
-            ms_2.dataset.passed ++;
-            ms_2.querySelector('.passed-container').innerHTML = '<span class="badge bg-success">' +  ms_2.dataset.passed + '</span>';
-        }
-        if (testStatus == 'S') {
-            ms_2.dataset.skip ++;
-            ms_2.querySelector('.skip-container').innerHTML = '<span class="badge bg-secondary">' +  ms_2.dataset.skip + '</span>';
-        }
-        if (testStatus == 'E') {
-            ms_2.dataset.error ++;
-            ms_2.querySelector('.error-container').innerHTML = '<span class="badge bg-warning">' +  ms_2.dataset.error + '</span>';
-        }
-        if (testStatus == 'F') {
-            ms_2.dataset.fail ++;
-            ms_2.querySelector('.fail-container').innerHTML = '<span class="badge bg-danger">' +  ms_2.dataset.fail + '</span>';
-        }
-    }
-
-    function totalStatusCounter(testStatus) {
-        if (testStatus == 'P') {
-            count = document.getElementById('total-passed').innerHTML;
-            count++;
-            document.getElementById('total-passed').innerHTML = count;
-        }
-        if (testStatus == 'S') {
-            count = document.getElementById('total-skip').innerHTML;
-            count++;
-            document.getElementById('total-skip').innerHTML = count++;
-        }
-        if (testStatus == 'E') {
-            count = document.getElementById('total-error').innerHTML;
-            count++;
-            document.getElementById('total-error').innerHTML = count++;
-        }
-        if (testStatus == 'F') {
-            count = document.getElementById('total-fail').innerHTML;
-            count++;
-            document.getElementById('total-fail').innerHTML = count++;
-        }
-    }
-
-    testcaselist.forEach(function (item, i) {
-        if (item.getAttribute('folder-testcaserun').length > 0) {
-            let folder = testcaselistnew.querySelector('ul[folder="' + item.getAttribute('folder-testcaserun') + '"]');
-            if (folder == null) {
-                let li = document.createElement('li');
-                li.setAttribute('class', 'list-group-item p-0');
-
-                let d_flex = document.createElement('div');
-                d_flex.setAttribute('class', 'd-flex align-items-center folder-maininfo');
-                let ms_2 = document.createElement('div');
-                let icon_div = document.createElement('div');
-                icon_div.setAttribute('class', 'col-auto ps-1');
-                icon_div.innerHTML = '<span class="me-2"><i class="bi bi-folder-minus h4"></i></span>';
-                ms_2.setAttribute('class', 'ms-2 folder-status d-flex justify-content-end flex-fill');
-                ms_2.setAttribute('data-passed', 0)
-                ms_2.setAttribute('data-skip', 0)
-                ms_2.setAttribute('data-error', 0)
-                ms_2.setAttribute('data-fail', 0)
-                let error_container = document.createElement('div')
-                error_container.setAttribute('class', 'error-container me-0dot5')
-                // error_container.setAttribute('style', 'margin-right: 2px;')
-                let passed_container = document.createElement('div')
-                passed_container.setAttribute('class', 'passed-container me-0dot5')
-                // passed_container.setAttribute('style', 'margin-right: 2px;')
-                let skip_container = document.createElement('div')
-                skip_container.setAttribute('class', 'skip-container me-0dot5')
-                // skip_container.setAttribute('style', 'margin-right: 2px;')
-                let fail_container = document.createElement('div')
-                fail_container.setAttribute('class', 'fail-container me-0dot5')
-                // fail_container.setAttribute('style', 'margin-right: 2px;')
-
-                let p = document.createElement('p');
-                p.setAttribute('class', 'mt-1 mb-2');
-                p.setAttribute('data-bs-toggle', 'collapse');
-                p.setAttribute('href', '#folderList' + i);
-                p.setAttribute('role', 'button');
-                p.setAttribute('aria-expanded', 'true');
-                p.setAttribute('aria-controls', 'folderList' + i);
-                p.innerHTML = item.getAttribute('folder-testcaserun');
-
-                let div = document.createElement('div');
-                div.setAttribute('class', 'collapse show');
-                div.setAttribute('id', 'folderList' + i);
-
-                folder = document.createElement('ul');
-                folder.setAttribute('folder', item.getAttribute('folder-testcaserun'));
-                folder.setAttribute('class', 'list-group-flush p-0 folder-test');
-
-                testcaselistnew.appendChild(li);
-                li.appendChild(d_flex);
-                d_flex.appendChild(icon_div);
-                d_flex.appendChild(p);
-                d_flex.appendChild(ms_2);
-                li.appendChild(div);
-                div.append(folder);
-                ms_2.append(error_container)
-                ms_2.append(passed_container)
-                ms_2.append(skip_container)
-                ms_2.append(fail_container)
-
-                p.addEventListener('click', function(event) {
-                    if (event.target.getAttribute('aria-expanded') === 'false') {
-                        icon_div.innerHTML = '<span class="me-2"><i class="bi bi-folder-plus h4"></i></span>';
-                    }
-                    else {
-                        icon_div.innerHTML = '<span class="me-2"><i class="bi bi-folder-minus h4"></i></span>';
-                    }
-                })
-            }
-            item.classList.add('ps-4');
-            folder.appendChild(item);
-            let folder_status = folder.parentNode.parentNode.querySelector('.folder-status');
-            statusCounter(item.getAttribute('status'), folder_status);
-        }
-        else {
-            testcaselistnew.appendChild(item);
-        }
-        totalStatusCounter(item.getAttribute('status'));
-    });
-    testcaseul.remove();
-</script>
-
-<script>
-
-
-function updateFoldersCounter() {
-    const folders = document.querySelectorAll('.folder-test');
-    folders.forEach(function(folder) {
-        let passed = 0;
-        let skip = 0;
-        let error = 0;
-        let fail = 0;
-        folder.querySelectorAll('li').forEach(function(item) {
-            if (item.getAttribute('status') == 'P' && !item.classList.contains('hide')) {
-                passed++;
-            }
-            if (item.getAttribute('status') == 'S' && !item.classList.contains('hide')) {
-                skip++;
-            }
-            if (item.getAttribute('status') == 'E' && !item.classList.contains('hide')) {
-                error++;
-            }
-            if (item.getAttribute('status') == 'F' && !item.classList.contains('hide')) {
-                fail++;
-            }
-        });
-        
-        const folder_status = folder.parentNode.parentNode.querySelector('.folder-status');
-        
-        folder_status.querySelector('.passed-container').innerHTML = '<span class="badge bg-success">' + passed + '</span>';
-        folder_status.querySelector('.skip-container').innerHTML = '<span class="badge bg-secondary">' + skip + '</span>';
-        folder_status.querySelector('.error-container').innerHTML = '<span class="badge bg-warning">' + error + '</span>';
-        folder_status.querySelector('.fail-container').innerHTML = '<span class="badge bg-danger">' + fail + '</span>';
-        folder_status.querySelectorAll('div').forEach(function(item) {
-            if (item.querySelector('span').innerHTML == '0') {
-                item.classList.add('hide');
-            }
-            else {
-                item.classList.remove('hide');
-            }
-        });
-    });
-}
-
-
-function hideShowTestCases(elem) {
-    if (elem.id == 'total-passed') {
-        const TestCases = document.querySelectorAll('.testcaseresult[status=P]')
-        if (elem.dataset.clicked == 'false') {
-            TestCases.forEach(function(item) {
-                item.classList.add('hide');
-            });
-            elem.classList.remove('bg-success');
-            elem.classList.add('border', 'border-success', 'text-success');
-            elem.dataset.clicked = 'true';
-        }
-        else {
-            TestCases.forEach(function(item) {
-                item.classList.remove('hide');
-            });
-            elem.classList.add('bg-success');
-            elem.classList.remove('border', 'border-success', 'text-success');
-            elem.dataset.clicked = 'false';
-        }
-    }
-    if (elem.id == 'total-skip') {
-        const TestCases = document.querySelectorAll('.testcaseresult[status=S]')
-        if (elem.dataset.clicked == 'false') {
-            TestCases.forEach(function(item) {
-                item.classList.add('hide');
-            });
-            elem.classList.remove('bg-secondary');
-            elem.classList.add('border', 'border-secondary', 'text-secondary');
-            elem.dataset.clicked = 'true';
-        }
-        else {
-            TestCases.forEach(function(item) {
-                item.classList.remove('hide');
-            });
-            elem.classList.add('bg-secondary');
-            elem.classList.remove('border', 'border-secondary', 'text-secondary');
-            elem.dataset.clicked = 'false';
-        }
-    }
-    if (elem.id == 'total-error') {
-        const TestCases = document.querySelectorAll('.testcaseresult[status=E]')
-        console.log(TestCases)
-        if (elem.dataset.clicked == 'false') {
-            TestCases.forEach(function(item) {
-                item.classList.add('hide');
-            });
-            elem.classList.remove('bg-warning');
-            elem.classList.add('border', 'border-warning', 'text-warning');
-            elem.dataset.clicked = 'true';
-        }
-        else {
-            TestCases.forEach(function(item) {
-                item.classList.remove('hide');
-            });
-            elem.classList.add('bg-warning');
-            elem.classList.remove('border', 'border-warning', 'text-warning');
-            elem.dataset.clicked = 'false';
-        }
-    }
-    if (elem.id == 'total-fail') {
-        const TestCases = document.querySelectorAll('.testcaseresult[status=F]')
-        console.log(TestCases)
-        if (elem.dataset.clicked == 'false') {
-            TestCases.forEach(function(item) {
-                item.classList.add('hide');
-            });
-            elem.classList.remove('bg-danger');
-            elem.classList.add('border', 'border-danger', 'text-danger');
-            elem.dataset.clicked = 'true';
-        }
-        else {
-            TestCases.forEach(function(item) {
-                item.classList.remove('hide');
-            });
-            elem.classList.add('bg-danger');
-            elem.classList.remove('border', 'border-danger', 'text-danger');
-            elem.dataset.clicked = 'false';
-        }
-    }
-    updateFoldersCounter();
-}
-
 </script>
 {% endblock %}

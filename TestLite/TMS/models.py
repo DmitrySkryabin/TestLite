@@ -220,6 +220,10 @@ class TestCaseRun(models.Model):
     report = models.TextField(null=True, blank=True)
     skipreason = models.TextField(null=True, blank=True)
 
+    fixtures = models.JSONField(null=True, blank=True)
+    params = models.JSONField(null=True, blank=True)
+    parametrize_name = models.CharField(max_length=200, null=True, blank=True)
+
     test_case = models.ForeignKey(TestCase, on_delete=models.CASCADE)
     test_suite_run = models.ForeignKey(TestSuiteRun, on_delete=models.CASCADE)
 

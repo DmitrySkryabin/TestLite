@@ -455,6 +455,7 @@ class TestSuiteRunDetailView(DetailView):
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
         context['testcaseruns'] = TestCaseRun.objects.filter(test_suite_run=self.object)
+        # context['testcaseruns_with_params'] = context['testcaseruns'].exclude(parametrize_name='None')
         return context
     
 
@@ -609,7 +610,22 @@ class APIv1(API):
     def save_testsuite(request, *args, **kwargs):
         testsuite_key = kwargs.get('testsuite')
         data = json.loads(request.body)
-        print(data)
         TestSuiteSaveHelper.save_test_suite_run(testsuite_key, data)
 
         return HttpResponse('LOL')
+    
+
+    def get_testcases_in_testsuite(request, *args, **kwargs):
+        testcases = TestSuite.objects.get(key=kwargs.get('testsuite')).test_cases.all()
+        keys: list = [testcase.key for testcase in testcases]
+        return JsonResponse({
+            'keys': keys
+        })
+    
+
+    def get_testcase_parameters(request, *args, **kwargs):
+        testcase = TestCase.objects.get(key=kwargs.get('testcase'))
+        if testcase.parameters is not None:
+            return JsonResponse(testcase.parameters)
+        else:
+            return JsonResponse({})
