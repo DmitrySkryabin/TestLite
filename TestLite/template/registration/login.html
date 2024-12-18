@@ -1,0 +1,27 @@
+{% extends 'main_without_header.html' %}
+
+{% block content %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/login.css' %}">
+<div class="d-flex align-items-center h-100">
+    <div class="form-signin w-100 m-auto">
+        <form method="post">
+            {% csrf_token %}
+            <h1 class="mb-3">TestLite</h1>
+            <div class="form-floating">
+                <input type="text" name="username" class="form-control" id="username">
+                <label for="floatingInput">Логин</label>
+            </div>
+            <div class="form-floating">
+                <input type="password" name="password" class="form-control" id="password">
+                <label for="floatingPassword">Пароль</label>
+            </div>
+
+            <div class="mb-5">
+                {{ form.errors }}
+            </div>
+            <button class="btn btn-warning w-100 py-2" type="submit">Войти</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

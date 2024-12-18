@@ -17,6 +17,7 @@
             <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
             </ul>
             {% endif %}
+            {% if user.is_authenticated %}
             <div class="text-end">
                 <div class="dropdown">
                     <button class="btn btn-warning btn-circle" type="button" id="dropdownMenuButton1"
@@ -25,11 +26,11 @@
                     </button>
                     <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
                         <li><a class="dropdown-item" href="#">Аккаунт ({{ request.user }})</a></li>
-                        <li><a class="dropdown-item" href="#">Выйти</a></li>
+                        <li><form action="{% url 'logout' %}" method="post">{% csrf_token %} <button type="submit" class="dropdown-item">Выйти</button> </form></li>
                     </ul>
                 </div>
-
             </div>
+            {% endif %}
         </div>
     </div>
 </header>

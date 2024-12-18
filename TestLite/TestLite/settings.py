@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
+import ldap
+from django_auth_ldap.config import LDAPSearch
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -47,6 +49,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.auth.middleware.LoginRequiredMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -103,6 +106,22 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+AUTHENTICATION_BACKENDS = [
+    "django_auth_ldap.backend.LDAPBackend",
+    'django.contrib.auth.backends.ModelBackend',
+    ]
+AUTH_LDAP_SERVER_URI = "ldap://localhost:10389"
+AUTH_LDAP_BIND_DN = 'cn=admin,dc=planetexpress,dc=com'
+AUTH_LDAP_BIND_PASSWORD = 'GoodNewsEveryone'
+AUTH_LDAP_USER_SEARCH = LDAPSearch(
+    'ou=people,dc=planetexpress,dc=com',
+    ldap.SCOPE_SUBTREE,
+    '(uid=%(user)s)',
+)
+
+LOGOUT_REDIRECT_URL = 'login'
+LOGIN_REDIRECT_URL = '/'
 
 
 # Internationalization
