@@ -1,14 +1,3 @@
 from django.contrib import admin
-from .models import *
 
 # Register your models here.
-admin.site.register(Project)
-admin.site.register(TestCaseFolder)
-admin.site.register(TestCase)
-admin.site.register(TestStep)
-admin.site.register(TestCaseRun)
-admin.site.register(TestStepRun)
-admin.site.register(TestSuite)
-admin.site.register(TestSuiteRun)
-admin.site.register(AutotestSetting)
-admin.site.register(AutotestSettingParam)
