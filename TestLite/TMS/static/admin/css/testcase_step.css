@@ -1,0 +1,172 @@
+/* --- Общие стили для шагов и элементов управления --- */
+
+/* Выравнивание элементов управления в одну строку */
+.form-row.field-inner_content > div {
+    display: flex;
+    flex-wrap: wrap; 
+}
+
+/* Контейнеры табов и кнопок - теперь вверху рядом */
+.view-tabs {
+    flex: 1; 
+    display: flex;
+    border-bottom: 1px solid #ccc;
+    margin-right: 10px; 
+    min-width: 300px; 
+}
+
+#add-buttons-container {
+    flex: 0 0 auto; 
+    margin-top: 3px; /* Скорректирован отступ, чтобы соответствовать высоте табов */
+}
+
+/* Стилизация кнопок добавления в стиле Django Admin */
+#add-buttons-container .button {
+    /* Используем стандартный класс Django Admin для кнопок */
+    margin-left: 5px;
+    padding: 6px 10px;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1; /* Для лучшего выравнивания текста */
+    vertical-align: top;
+    text-shadow: none;
+    box-shadow: none;
+}
+
+/* --- Стили для содержимого (вертикальный макет шагов) --- */
+
+#steps-container {
+    display: flex;
+    flex-direction: column; 
+    gap: 6px;
+    padding: 10px; 
+    border: 1px solid #ccc; 
+    border-top: none; 
+    width: 100%;
+    box-sizing: border-box;
+    background-color: #f7f7f7; /* Легкий фон для списка шагов */
+}
+
+/* Контейнер для визуального редактора и JSON должен занимать всю ширину под табами */
+#visual-widget-wrapper.tab-content, 
+#id_inner_content.tab-content {
+    flex-basis: 100%; 
+    order: 1; 
+    margin-top: -1px; 
+}
+
+/* --- Стили для отдельного шага --- */
+
+.step-row {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    padding: 6px 4px;
+    border: 1px solid #ddd;
+    background-color: #fff;
+    border-radius: 4px;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
+}
+
+.step-fields {
+    display: flex;
+    flex: 1;
+    gap: 6px;
+}
+
+.step-fields input {
+    flex: 1;
+    padding: 4px 6px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+    border-radius: 4px;
+}
+
+.comment-row .step-fields input {
+    flex: 2;
+    background-color: #fcfcfc;
+    border-left: 3px solid #77aadd; 
+}
+
+/* --- Стили для Drag & Drop --- */
+.drag-handle {
+    cursor: grab;
+    font-weight: bold;
+    color: #999;
+    padding: 0 5px;
+    font-size: 14px;
+    line-height: 20px;
+}
+
+.sortable-ghost {
+    opacity: 0.4;
+    background-color: #e6e6e6;
+    box-shadow: none;
+}
+
+/* Кнопка удаления шага (оставляем кастомный стиль, чтобы отличался от Django Admin) */
+.remove-step {
+    background: #c34c4c; /* Красный, но чуть более приглушенный */
+    color: white;
+    border: none;
+    border-radius: 4px;
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    font-weight: bold;
+    line-height: 1;
+    font-size: 16px;
+    padding: 0;
+    margin-left: 5px;
+    flex-shrink: 0;
+}
+
+.remove-step:hover {
+    background: #a94442;
+}
+
+
+/* --- Стили для Табов --- */
+
+.tab-btn {
+    padding: 8px 15px;
+    border: 1px solid #ccc;
+    border-bottom: none;
+    background: #e1e1e1; /* Светло-серый фон как у Django Admin */
+    color: #333;
+    cursor: pointer;
+    font-weight: 500;
+    border-radius: 4px 4px 0 0;
+    margin-right: 2px;
+}
+
+.tab-btn.active {
+    background: white;
+    border-color: #ccc;
+    border-top: 3px solid #79aec8; /* Синий цвет Django Admin */
+    color: #333;
+    position: relative; 
+    z-index: 10;
+    margin-bottom: -1px; 
+    padding-top: 7px; /* Компенсируем более толстый border */
+}
+
+.tab-content {
+    display: none;
+    box-sizing: border-box;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+#id_inner_content {
+    font-family: monospace;
+    font-size: 14px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    resize: vertical;
+    width: 100%;
+    height: 400px;
+}
